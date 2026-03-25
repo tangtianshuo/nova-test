@@ -1,0 +1,72 @@
+# Tasks
+
+## Phase 1: 计划结构优化
+- [x] Task 1: 优化 EP-01 SDD与Schema计划
+  - [x] SubTask 1.1: 添加标准化结构元素（依赖关系、并行可能性）
+  - [x] SubTask 1.2: 细化 Harness 测试用例列表
+  - [x] SubTask 1.3: 添加代码目录结构映射
+  - [x] SubTask 1.4: 补充中文注释规范说明
+- [x] Task 2: 优化 EP-02 数据库与存储计划
+  - [x] SubTask 2.1: 添加与 EP-01 的依赖关系说明
+  - [x] SubTask 2.2: 细化 DB Migration Harness 测试用例
+  - [x] SubTask 2.3: 添加 Storage Access Harness 具体用例
+  - [x] SubTask 2.4: 补充数据模型与 Schema 的映射关系
+- [x] Task 3: 优化 EP-03 控制面API与鉴权计划
+  - [x] SubTask 3.1: 添加与 EP-01, EP-02 的依赖关系
+  - [x] SubTask 3.2: 细化 API Contract Harness 测试用例（含错误码）
+  - [x] SubTask 3.3: 添加 Multi-tenant Negative Harness 具体用例
+  - [x] SubTask 3.4: 补充 RBAC 权限矩阵
+- [x] Task 4: 优化 EP-04 AaaS执行面与状态机计划
+  - [x] SubTask 4.1: 添加与 EP-01, EP-02, EP-03 的依赖关系
+  - [x] SubTask 4.2: 细化 StateMachine Node Harness 测试用例
+  - [x] SubTask 4.3: 添加 Replay Harness 具体场景
+  - [x] SubTask 4.4: 补充状态机节点中文注释规范
+- [x] Task 5: 优化 EP-05 推流与HIL计划
+  - [x] SubTask 5.1: 添加与 EP-04 的依赖关系
+  - [x] SubTask 5.2: 细化 EventSchema Harness 测试用例
+  - [x] SubTask 5.3: 添加 HIL Flow Harness 完整场景
+  - [x] SubTask 5.4: 补充 WebSocket 契约测试规范
+- [x] Task 6: 优化 EP-06 报告与导出计划
+  - [x] SubTask 6.1: 添加与 EP-02, EP-04, EP-05 的依赖关系
+  - [x] SubTask 6.2: 细化 Golden File Harness 测试用例
+  - [x] SubTask 6.3: 添加 Security Harness 敏感信息扫描规则
+  - [x] SubTask 6.4: 补充导出格式规范
+- [x] Task 7: 优化 EP-07 UI控制台计划
+  - [x] SubTask 7.1: 添加与 EP-03, EP-05, EP-06 的依赖关系
+  - [x] SubTask 7.2: 细化 No-Scroll Harness 测试用例
+  - [x] SubTask 7.3: 添加 Paging Harness 分页测试规范
+  - [x] SubTask 7.4: 补充 Overlay Harness 标注层测试
+- [x] Task 8: 优化 EP-08 安全合规与多租户验证计划
+  - [x] SubTask 8.1: 明确安全计划贯穿所有迭代的定位
+  - [x] SubTask 8.2: 细化 Tenant Isolation Harness 测试用例
+  - [x] SubTask 8.3: 添加 Sensitive Leak Harness 扫描规则
+  - [x] SubTask 8.4: 补充 HIL Audit Harness 审计字段规范
+- [x] Task 9: 优化 EP-09 可观测性与发布闸门计划
+  - [x] SubTask 9.1: 添加与所有计划的依赖关系
+  - [x] SubTask 9.2: 细化 Traceability Harness 测试用例
+  - [x] SubTask 9.3: 添加完整的发布闸门 DoD 清单
+  - [x] SubTask 9.4: 补充关键路径说明
+- [x] Task 10: 更新计划索引 00_INDEX.md
+  - [x] SubTask 10.1: 添加依赖关系图
+  - [x] SubTask 10.2: 添加并行执行可能性说明
+  - [x] SubTask 10.3: 添加迭代里程碑映射
+  - [x] SubTask 10.4: 补充关键路径说明
+- [x] Task 11: 创建依赖关系可视化
+  - [x] SubTask 11.1: 生成 Mermaid 依赖关系图
+  - [x] SubTask 11.2: 标注关键路径
+  - [x] SubTask 11.3: 标注可并行的计划
+- [x] Task 12: 创建代码目录结构文档
+  - [x] SubTask 12.1: 定义后端目录结构 (NestJS/Python)
+  - [x] SubTask 12.2: 定义前端目录结构 (Next.js)
+  - [x] SubTask 12.3: 定义测试目录结构
+              - [x] SubTask 12.4: 定义配置文件规范
+- [x] Task 13: 创建中文注释规范文档
+  - [x] SubTask 13.1: 状态机注释规范
+  - [x] SubTask 13.2: 安全边界注释规范
+              - [x] SubTask 13.3: HIL 处理注释规范
+  - [x] SubTask 13.4: 错误恢复注释规范
+## Task Dependencies
+- Task 1-9 可并行执行（各自优化独立计划）
+- Task 10 依赖 Task 1-9 完成
+- Task 11 依赖 Task 10 完成
+            - Task 12-13 可与 Task 1-9 并行执行

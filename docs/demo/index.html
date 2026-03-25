@@ -1,0 +1,2209 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>黑盒自动化测试工具 - 静态Demo</title>
+    <style>
+      :root {
+        --bg: #f7f8fa;
+        --surface: #ffffff;
+        --surface-2: #eef0f3;
+        --border: #dde1e6;
+        --text: #121826;
+        --text-2: #2e3440;
+        --muted: #8a93a3;
+
+        --primary: #3b82f6;
+        --primary-600: #2563eb;
+        --primary-50: #eff6ff;
+
+        --success: #22c55e;
+        --warning: #f59e0b;
+        --danger: #ef4444;
+        --info: #06b6d4;
+
+        --success-bg: #ecfdf3;
+        --warning-bg: #fffbeb;
+        --danger-bg: #fef2f2;
+        --info-bg: #ecfeff;
+
+        --shadow: 0 10px 25px rgba(15, 23, 42, 0.08);
+        --shadow-2: 0 14px 40px rgba(15, 23, 42, 0.14);
+        --radius: 14px;
+        --radius-sm: 10px;
+        --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      html,
+      body {
+        height: 100%;
+        overflow: hidden;
+      }
+
+      body {
+        margin: 0;
+        font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
+        color: var(--text);
+        background: var(--bg);
+      }
+
+      .app {
+        height: 100vh;
+        display: grid;
+        grid-template-columns: 260px 1fr;
+      }
+
+      .sidebar {
+        background: #0b1220;
+        color: #e5e7eb;
+        padding: 18px 14px;
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+        border-right: 1px solid rgba(255, 255, 255, 0.06);
+      }
+
+      .brand {
+        padding: 10px 10px 14px;
+        border-radius: 12px;
+        background: rgba(255, 255, 255, 0.04);
+      }
+
+      .brand .name {
+        font-weight: 700;
+        font-size: 14px;
+        letter-spacing: 0.2px;
+      }
+
+      .brand .sub {
+        margin-top: 4px;
+        font-size: 12px;
+        color: rgba(229, 231, 235, 0.72);
+      }
+
+      .nav {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+      }
+
+      .nav button {
+        width: 100%;
+        text-align: left;
+        border: 1px solid transparent;
+        background: transparent;
+        color: rgba(229, 231, 235, 0.86);
+        padding: 10px 10px;
+        border-radius: 12px;
+        cursor: pointer;
+        font-size: 13px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        transition: background 120ms ease, border-color 120ms ease;
+      }
+
+      .nav button:hover {
+        background: rgba(255, 255, 255, 0.05);
+      }
+
+      .nav button[data-active="true"] {
+        background: rgba(59, 130, 246, 0.18);
+        border-color: rgba(59, 130, 246, 0.35);
+        color: #ffffff;
+      }
+
+      .pill {
+        font-size: 11px;
+        padding: 2px 8px;
+        border-radius: 999px;
+        background: rgba(255, 255, 255, 0.08);
+        color: rgba(229, 231, 235, 0.86);
+      }
+
+      .pill.warn {
+        background: rgba(245, 158, 11, 0.18);
+        color: rgba(253, 230, 138, 0.95);
+      }
+
+      .sidebar .footer {
+        margin-top: auto;
+        padding: 10px;
+        border-radius: 12px;
+        background: rgba(255, 255, 255, 0.04);
+        color: rgba(229, 231, 235, 0.78);
+        font-size: 12px;
+        line-height: 1.45;
+      }
+
+      .main {
+        display: grid;
+        grid-template-rows: auto 1fr;
+        min-width: 0;
+      }
+
+      .topbar {
+        padding: 14px 18px;
+        border-bottom: 1px solid var(--border);
+        background: rgba(255, 255, 255, 0.75);
+        backdrop-filter: blur(10px);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+      }
+
+      .title {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+      }
+
+      .title .h {
+        font-size: 14px;
+        font-weight: 700;
+        color: var(--text);
+      }
+
+      .title .d {
+        font-size: 12px;
+        color: var(--muted);
+      }
+
+      .topbar .actions {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        flex-wrap: wrap;
+      }
+
+      .btn {
+        border: 1px solid var(--border);
+        background: var(--surface);
+        color: var(--text-2);
+        padding: 9px 12px;
+        border-radius: 12px;
+        cursor: pointer;
+        font-size: 13px;
+        transition: background 120ms ease, border-color 120ms ease, transform 120ms ease;
+        user-select: none;
+      }
+
+      .btn:hover {
+        background: #fbfcfd;
+        border-color: #cfd6dd;
+      }
+
+      .btn:active {
+        transform: translateY(1px);
+      }
+
+      .btn.primary {
+        background: var(--primary);
+        border-color: rgba(37, 99, 235, 0.15);
+        color: #ffffff;
+      }
+
+      .btn.primary:hover {
+        background: var(--primary-600);
+      }
+
+      .btn.danger {
+        background: var(--danger);
+        border-color: rgba(239, 68, 68, 0.25);
+        color: #ffffff;
+      }
+
+      .btn.danger:hover {
+        filter: brightness(0.95);
+      }
+
+      .btn.ghost {
+        background: transparent;
+        border-color: transparent;
+      }
+
+      .btn.ghost:hover {
+        background: rgba(59, 130, 246, 0.08);
+        border-color: rgba(59, 130, 246, 0.12);
+      }
+
+      .btn:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+      }
+
+      .content {
+        padding: 18px;
+        overflow: hidden;
+      }
+
+      .grid {
+        height: 100%;
+        display: grid;
+        grid-template-columns: 420px 1fr;
+        gap: 14px;
+        min-width: 0;
+      }
+
+      .panel {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        box-shadow: var(--shadow);
+        overflow: hidden;
+        min-width: 0;
+        display: flex;
+        flex-direction: column;
+      }
+
+      .panel .ph {
+        padding: 12px 14px;
+        border-bottom: 1px solid var(--border);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+      }
+
+      .panel .ph .name {
+        font-weight: 700;
+        font-size: 13px;
+      }
+
+      .panel .ph .meta {
+        font-size: 12px;
+        color: var(--muted);
+      }
+
+      .panel .pb {
+        padding: 12px 14px;
+        overflow: hidden;
+        min-height: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+      }
+
+      .pager {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        padding-top: 6px;
+      }
+
+      .pager .hint {
+        font-size: 12px;
+        color: var(--muted);
+      }
+
+      .seg {
+        display: inline-flex;
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        overflow: hidden;
+        background: var(--surface);
+      }
+
+      .seg button {
+        border: none;
+        background: transparent;
+        padding: 8px 10px;
+        font-size: 12px;
+        color: var(--muted);
+        cursor: pointer;
+      }
+
+      .seg button[data-active="true"] {
+        background: var(--primary-50);
+        color: var(--primary-600);
+        font-weight: 700;
+      }
+
+      .list {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+      }
+
+      .card {
+        border: 1px solid var(--border);
+        border-radius: 14px;
+        padding: 12px;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        cursor: pointer;
+        transition: border-color 120ms ease, transform 120ms ease, box-shadow 120ms ease;
+      }
+
+      .card:hover {
+        border-color: #cfd6dd;
+        box-shadow: 0 12px 26px rgba(15, 23, 42, 0.08);
+        transform: translateY(-1px);
+      }
+
+      .card[data-active="true"] {
+        border-color: rgba(59, 130, 246, 0.55);
+        box-shadow: 0 12px 26px rgba(59, 130, 246, 0.13);
+      }
+
+      .row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        min-width: 0;
+      }
+
+      .row .left {
+        min-width: 0;
+      }
+
+      .k {
+        font-size: 12px;
+        color: var(--muted);
+      }
+
+      .v {
+        font-size: 13px;
+        color: var(--text);
+        font-weight: 700;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      .badge {
+        font-size: 11px;
+        font-weight: 700;
+        padding: 4px 10px;
+        border-radius: 999px;
+        border: 1px solid transparent;
+        user-select: none;
+      }
+
+      .badge.info {
+        background: var(--info-bg);
+        color: #0e7490;
+        border-color: rgba(6, 182, 212, 0.25);
+      }
+
+      .badge.success {
+        background: var(--success-bg);
+        color: #15803d;
+        border-color: rgba(34, 197, 94, 0.25);
+      }
+
+      .badge.warning {
+        background: var(--warning-bg);
+        color: #b45309;
+        border-color: rgba(245, 158, 11, 0.25);
+      }
+
+      .badge.danger {
+        background: var(--danger-bg);
+        color: #b91c1c;
+        border-color: rgba(239, 68, 68, 0.25);
+      }
+
+      .split {
+        height: 100%;
+        display: grid;
+        grid-template-rows: auto 1fr;
+        min-height: 0;
+      }
+
+      .summary {
+        padding: 12px 14px;
+        border-bottom: 1px solid var(--border);
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 10px;
+      }
+
+      .metric {
+        border: 1px solid var(--border);
+        border-radius: 14px;
+        padding: 10px;
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+        background: linear-gradient(180deg, rgba(255, 255, 255, 0.95), rgba(247, 248, 250, 0.7));
+      }
+
+      .metric .n {
+        font-size: 16px;
+        font-weight: 800;
+        color: var(--text);
+        letter-spacing: 0.2px;
+      }
+
+      .metric .l {
+        font-size: 12px;
+        color: var(--muted);
+      }
+
+      .live {
+        overflow: hidden;
+        display: grid;
+        grid-template-columns: 1.35fr 0.65fr;
+        gap: 14px;
+        padding: 14px;
+        min-width: 0;
+      }
+
+      .shot {
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        overflow: hidden;
+        background: #0b1220;
+        position: relative;
+        min-height: 360px;
+        display: flex;
+        flex-direction: column;
+      }
+
+      .shot .bar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        padding: 10px 12px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+        color: rgba(229, 231, 235, 0.9);
+      }
+
+      .shot .bar .hint {
+        font-size: 12px;
+        color: rgba(229, 231, 235, 0.72);
+      }
+
+      .shot .frame {
+        position: relative;
+        flex: 1;
+        display: grid;
+        place-items: center;
+        overflow: hidden;
+      }
+
+      .shot img {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+        display: block;
+      }
+
+      .overlay {
+        position: absolute;
+        inset: 0;
+        pointer-events: none;
+      }
+
+      .side {
+        display: grid;
+        grid-template-rows: auto 1fr;
+        gap: 12px;
+        min-width: 0;
+        min-height: 0;
+      }
+
+      .actionCard {
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        background: var(--surface);
+        box-shadow: var(--shadow);
+        overflow: hidden;
+      }
+
+      .actionCard .h {
+        padding: 12px;
+        border-bottom: 1px solid var(--border);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+      }
+
+      .actionCard .h .t {
+        font-size: 13px;
+        font-weight: 800;
+      }
+
+      .actionCard .b {
+        padding: 12px;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+      }
+
+      .kv {
+        display: grid;
+        grid-template-columns: 88px 1fr;
+        gap: 8px;
+        align-items: start;
+      }
+
+      .kv .kk {
+        font-size: 12px;
+        color: var(--muted);
+      }
+
+      .kv .vv {
+        font-size: 12px;
+        color: var(--text-2);
+        line-height: 1.5;
+        word-break: break-word;
+      }
+
+      .mono {
+        font-family: var(--mono);
+      }
+
+      .logTimeline {
+        display: grid;
+        grid-template-rows: 1fr 1fr;
+        gap: 12px;
+        min-height: 0;
+      }
+
+      .box {
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        background: var(--surface);
+        box-shadow: var(--shadow);
+        overflow: hidden;
+        min-height: 0;
+        display: grid;
+        grid-template-rows: auto 1fr;
+      }
+
+      .box .h {
+        padding: 10px 12px;
+        border-bottom: 1px solid var(--border);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+      }
+
+      .box .h .t {
+        font-size: 12px;
+        font-weight: 800;
+      }
+
+      .box .h .r {
+        font-size: 12px;
+        color: var(--muted);
+      }
+
+      .box .b {
+        padding: 10px 12px;
+        overflow: hidden;
+      }
+
+      .log {
+        font-family: var(--mono);
+        font-size: 11px;
+        line-height: 1.5;
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+      }
+
+      .log .line {
+        display: flex;
+        align-items: baseline;
+        gap: 8px;
+      }
+
+      .log .lvl {
+        width: 58px;
+        font-weight: 800;
+      }
+
+      .log .lvl.info {
+        color: #0e7490;
+      }
+
+      .log .lvl.warn {
+        color: #92400e;
+      }
+
+      .log .lvl.error {
+        color: #991b1b;
+      }
+
+      .log .msg {
+        color: var(--text-2);
+      }
+
+      .timeline {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
+
+      .step {
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 10px;
+        display: flex;
+        gap: 10px;
+        cursor: pointer;
+        transition: border-color 120ms ease, background 120ms ease;
+        background: #ffffff;
+      }
+
+      .step:hover {
+        border-color: #cfd6dd;
+        background: #fbfcfd;
+      }
+
+      .step[data-active="true"] {
+        border-color: rgba(59, 130, 246, 0.55);
+        background: rgba(239, 246, 255, 0.55);
+      }
+
+      .step .n {
+        width: 40px;
+        height: 40px;
+        border-radius: 12px;
+        display: grid;
+        place-items: center;
+        font-weight: 900;
+        color: var(--text);
+        background: var(--surface-2);
+      }
+
+      .step .m {
+        min-width: 0;
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+      }
+
+      .step .m .a {
+        font-size: 12px;
+        font-weight: 800;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      .step .m .b {
+        font-size: 12px;
+        color: var(--muted);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      .drawer {
+        position: fixed;
+        inset: 0;
+        display: none;
+        align-items: flex-end;
+        justify-content: flex-end;
+        background: rgba(2, 6, 23, 0.4);
+        backdrop-filter: blur(6px);
+        z-index: 40;
+      }
+
+      .drawer[data-open="true"] {
+        display: flex;
+      }
+
+      .drawer .panel {
+        width: min(520px, 96vw);
+        height: min(92vh, 820px);
+        border-radius: 16px;
+        box-shadow: var(--shadow-2);
+        border: 1px solid rgba(255, 255, 255, 0.35);
+      }
+
+      .drawer .ph {
+        background: linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(255, 255, 255, 0.92));
+      }
+
+      .json {
+        font-family: var(--mono);
+        font-size: 11px;
+        padding: 10px;
+        border-radius: 12px;
+        border: 1px solid var(--border);
+        background: #0b1220;
+        color: rgba(229, 231, 235, 0.9);
+        white-space: pre;
+        overflow: hidden;
+        height: 156px;
+      }
+
+      .field {
+        display: grid;
+        grid-template-columns: 90px 1fr;
+        gap: 10px;
+        align-items: center;
+      }
+
+      .field label {
+        font-size: 12px;
+        color: var(--muted);
+      }
+
+      .field input {
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 10px 12px;
+        font-size: 13px;
+        outline: none;
+      }
+
+      .field input:focus {
+        border-color: rgba(59, 130, 246, 0.6);
+        box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.12);
+      }
+
+      .muted {
+        color: var(--muted);
+        font-size: 12px;
+        line-height: 1.5;
+      }
+
+      @media (max-width: 1180px) {
+        .grid {
+          grid-template-columns: minmax(320px, 44vw) 1fr;
+        }
+      }
+
+      @media (max-width: 860px) {
+        .app {
+          grid-template-columns: 1fr;
+        }
+        .sidebar {
+          display: none;
+        }
+        .summary {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+        .live {
+          grid-template-columns: 1fr;
+        }
+        .logTimeline {
+          grid-template-rows: 1fr 1.2fr;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="app">
+      <aside class="sidebar">
+        <div class="brand">
+          <div class="name">黑盒自动化测试工具</div>
+          <div class="sub">静态Demo · SaaS + AaaS · SDD</div>
+        </div>
+
+        <div class="nav" id="nav">
+          <button data-nav="tasks" data-active="true"><span>任务</span><span class="pill" id="pillTasks">2</span></button>
+          <button data-nav="live"><span>实例 Live Console</span><span class="pill" id="pillLive">1</span></button>
+          <button data-nav="hil"><span>HIL 工单</span><span class="pill warn" id="pillHil">0</span></button>
+          <button data-nav="report"><span>报告回放</span><span class="pill" id="pillReport">1</span></button>
+        </div>
+
+        <div class="footer">
+          <div>Mock 推流：截图、标注层、Thought、日志、时间线</div>
+          <div>HIL：批准 / 修改 / 拒绝</div>
+        </div>
+      </aside>
+
+      <main class="main">
+        <header class="topbar">
+          <div class="title">
+            <div class="h" id="topTitle">任务</div>
+            <div class="d" id="topDesc">选择任务与实例，进入 Live Console 观察视觉感知过程</div>
+          </div>
+          <div class="actions">
+            <div class="seg" id="modeSeg">
+              <button data-mode="auto" data-active="true">自动执行</button>
+              <button data-mode="hil">优先HIL</button>
+              <button data-mode="safe">保守</button>
+            </div>
+            <button class="btn" id="btnNewTask">新建任务</button>
+            <button class="btn primary" id="btnStart">开始推流</button>
+            <button class="btn" id="btnPause" disabled>暂停</button>
+            <button class="btn danger" id="btnStop" disabled>终止</button>
+          </div>
+        </header>
+
+        <section class="content">
+          <div class="grid">
+            <section class="panel" id="panelLeft">
+              <div class="ph">
+                <div>
+                  <div class="name">任务列表</div>
+                  <div class="meta" id="taskMeta">Workspace: Nova · 2 个任务</div>
+                </div>
+                <div class="seg" id="leftSeg">
+                  <button data-left="tasks" data-active="true">任务</button>
+                  <button data-left="instances">实例</button>
+                </div>
+              </div>
+              <div class="pb">
+                <div class="list" id="taskList"></div>
+                <div class="list" id="instanceList" style="display:none"></div>
+                <div class="pager" id="leftPager">
+                  <button class="btn" id="btnLeftPrev">上一页</button>
+                  <div class="hint" id="leftPagerHint">-</div>
+                  <button class="btn" id="btnLeftNext">下一页</button>
+                </div>
+              </div>
+            </section>
+
+            <section class="panel" id="panelRight">
+              <div class="split">
+                <div class="summary" id="summary">
+                  <div class="metric"><div class="n" id="mStatus">Idle</div><div class="l">Instance 状态</div></div>
+                  <div class="metric"><div class="n" id="mStep">0</div><div class="l">步数</div></div>
+                  <div class="metric"><div class="n" id="mHil">0</div><div class="l">HIL 次数</div></div>
+                  <div class="metric"><div class="n" id="mDef">0</div><div class="l">缺陷</div></div>
+                </div>
+                <div class="live" id="viewLive">
+                  <div class="shot">
+                    <div class="bar">
+                      <div>
+                        <div style="font-weight:800;font-size:12px">视觉画面 + 标注层</div>
+                        <div class="hint" id="shotHint">Overlay: bbox / click point / multi-candidates</div>
+                      </div>
+                      <div class="hint" id="streamHint">WS: disconnected</div>
+                    </div>
+                    <div class="frame" id="frame">
+                      <img id="liveShot" alt="screenshot" />
+                      <canvas class="overlay" id="overlay"></canvas>
+                    </div>
+                  </div>
+
+                  <div class="side">
+                    <div class="actionCard">
+                      <div class="h">
+                        <div class="t">动作卡（SDD Action）</div>
+                        <div id="actionBadge" class="badge info">READY</div>
+                      </div>
+                      <div class="b" id="actionBody">
+                        <div class="kv"><div class="kk">Thought</div><div class="vv" id="acThought">选择实例后开始推流</div></div>
+                        <div class="kv"><div class="kk">Action</div><div class="vv mono" id="acAction">-</div></div>
+                        <div class="kv"><div class="kk">Confidence</div><div class="vv" id="acConf">-</div></div>
+                        <div class="kv"><div class="kk">Expected</div><div class="vv" id="acExpected">-</div></div>
+                      </div>
+                    </div>
+
+                    <div class="logTimeline">
+                      <div class="box">
+                        <div class="h">
+                          <div class="t">日志</div>
+                          <div class="r" style="display:flex;align-items:center;gap:10px">
+                            <button class="btn" id="btnLogPrev">上一页</button>
+                            <span id="logRight">0 行</span>
+                            <button class="btn" id="btnLogNext">下一页</button>
+                          </div>
+                        </div>
+                        <div class="b"><div class="log" id="log"></div></div>
+                      </div>
+                      <div class="box">
+                        <div class="h">
+                          <div class="t">时间线</div>
+                          <div class="r" style="display:flex;align-items:center;gap:10px">
+                            <button class="btn" id="btnTlPrev">上一页</button>
+                            <span id="tlRight">0 步</span>
+                            <button class="btn" id="btnTlNext">下一页</button>
+                          </div>
+                        </div>
+                        <div class="b"><div class="timeline" id="timeline"></div></div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="live" id="viewReport" style="display:none">
+                  <div class="shot">
+                    <div class="bar">
+                      <div>
+                        <div style="font-weight:800;font-size:12px">报告回放画面</div>
+                        <div class="hint" id="repHint">选择时间线步骤进行回放</div>
+                      </div>
+                      <div class="hint" id="repMeta">Report</div>
+                    </div>
+                    <div class="frame">
+                      <img id="repShot" alt="report_screenshot" />
+                      <canvas class="overlay" id="repOverlay"></canvas>
+                    </div>
+                  </div>
+
+                  <div class="side">
+                    <div class="actionCard">
+                      <div class="h">
+                        <div class="t">报告摘要</div>
+                        <div id="repBadge" class="badge info">DRAFT</div>
+                      </div>
+                      <div class="b">
+                        <div class="kv"><div class="kk">结论</div><div class="vv" id="repVerdict">-</div></div>
+                        <div class="kv"><div class="kk">缺陷</div><div class="vv" id="repDefects">-</div></div>
+                        <div class="kv"><div class="kk">HIL</div><div class="vv" id="repHil">-</div></div>
+                        <div class="kv"><div class="kk">导出</div><div class="vv"><button class="btn" id="btnExportJson">导出JSON</button></div></div>
+                      </div>
+                    </div>
+
+                    <div class="logTimeline">
+                      <div class="box">
+                        <div class="h">
+                          <div class="t">缺陷列表</div>
+                          <div class="r" style="display:flex;align-items:center;gap:10px">
+                            <button class="btn" id="btnDefPrev">上一页</button>
+                            <span id="defRight">0 条</span>
+                            <button class="btn" id="btnDefNext">下一页</button>
+                          </div>
+                        </div>
+                        <div class="b" id="defList"></div>
+                      </div>
+                      <div class="box">
+                        <div class="h">
+                          <div class="t">时间线</div>
+                          <div class="r" style="display:flex;align-items:center;gap:10px">
+                            <button class="btn" id="btnRepTlPrev">上一页</button>
+                            <span id="repTlRight">0 步</span>
+                            <button class="btn" id="btnRepTlNext">下一页</button>
+                          </div>
+                        </div>
+                        <div class="b"><div class="timeline" id="repTimeline"></div></div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </section>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <div class="drawer" id="hilDrawer" data-open="false">
+      <div class="panel">
+        <div class="ph">
+          <div>
+            <div class="name">HIL 工单</div>
+            <div class="meta" id="hilMeta">WAITING</div>
+          </div>
+          <button class="btn" id="btnHilClose">关闭</button>
+        </div>
+        <div class="pb" style="display:flex;flex-direction:column;gap:12px">
+          <div class="row">
+            <div class="left">
+              <div class="k">原因</div>
+              <div class="v" id="hilReason">-</div>
+            </div>
+            <div id="hilRisk" class="badge warning">MEDIUM</div>
+          </div>
+
+          <div class="muted" id="hilTip">你可以批准继续、拒绝终止，或修改坐标后继续执行。</div>
+
+          <div class="json" id="hilJson">{}</div>
+
+          <div style="display:flex;gap:10px;align-items:center;justify-content:space-between">
+            <div class="muted" id="hilJsonHint">已截断显示，避免滚动条</div>
+            <button class="btn" id="btnHilCopy">复制JSON</button>
+          </div>
+
+          <div style="border:1px solid var(--border);border-radius:14px;overflow:hidden">
+            <div style="padding:10px 12px;border-bottom:1px solid var(--border);font-weight:800;font-size:12px">现场截图（带标注）</div>
+            <div style="position:relative;background:#0b1220;display:grid;place-items:center;height:220px">
+              <img id="hilShot" alt="hil_screenshot" style="width:100%;height:100%;object-fit:contain" />
+              <canvas class="overlay" id="hilOverlay"></canvas>
+            </div>
+          </div>
+
+          <div style="display:flex;gap:10px;flex-wrap:wrap">
+            <button class="btn primary" id="btnHilApprove">批准继续</button>
+            <button class="btn" id="btnHilModify">修改动作</button>
+            <button class="btn danger" id="btnHilReject">拒绝并终止</button>
+          </div>
+
+          <div id="modifyArea" style="display:none;border:1px solid var(--border);border-radius:14px;padding:12px;gap:10px;flex-direction:column">
+            <div style="font-weight:800;font-size:12px">修改动作坐标</div>
+            <div class="field"><label for="mx">x</label><input id="mx" inputmode="numeric" /></div>
+            <div class="field"><label for="my">y</label><input id="my" inputmode="numeric" /></div>
+            <div style="display:flex;gap:10px;justify-content:flex-end">
+              <button class="btn" id="btnModifyCancel">取消</button>
+              <button class="btn primary" id="btnModifyApply">应用并继续</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      const $ = (sel) => document.querySelector(sel)
+      const $$ = (sel) => Array.from(document.querySelectorAll(sel))
+
+      const fmtTime = (d) => {
+        const pad = (n) => String(n).padStart(2, '0')
+        return `${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`
+      }
+
+      const uid = () => Math.random().toString(16).slice(2, 10)
+
+      const clamp = (n, a, b) => Math.max(a, Math.min(b, n))
+
+      const badgeClassByStatus = (status) => {
+        if (status === 'RUNNING') return 'info'
+        if (status === 'PAUSED_HIL') return 'warning'
+        if (status === 'SUCCESS') return 'success'
+        if (status === 'FAILED') return 'danger'
+        return 'info'
+      }
+
+      const mkSvgShot = ({ step, title, w = 1280, h = 720, accent = '#3B82F6' }) => {
+        const rnd = (min, max) => Math.floor(min + Math.random() * (max - min + 1))
+        const blocks = Array.from({ length: 7 }).map((_, i) => {
+          const x = rnd(70, w - 260)
+          const y = rnd(90, h - 170)
+          const bw = rnd(140, 320)
+          const bh = rnd(28, 72)
+          const o = (0.12 + i * 0.04).toFixed(2)
+          return `<rect x="${x}" y="${y}" width="${bw}" height="${bh}" rx="10" fill="rgba(255,255,255,${o})" />`
+        })
+
+        const s = `<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#0B1220" />
+      <stop offset="1" stop-color="#1F2A44" />
+    </linearGradient>
+    <linearGradient id="acc" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="${accent}" />
+      <stop offset="1" stop-color="#06B6D4" />
+    </linearGradient>
+  </defs>
+  <rect width="${w}" height="${h}" fill="url(#bg)" />
+  <rect x="40" y="40" width="${w - 80}" height="${h - 80}" rx="22" fill="rgba(255,255,255,0.06)" stroke="rgba(255,255,255,0.10)" />
+  <rect x="70" y="80" width="${w - 140}" height="64" rx="16" fill="rgba(255,255,255,0.08)" />
+  <rect x="92" y="102" width="280" height="20" rx="10" fill="rgba(255,255,255,0.22)" />
+  <rect x="${w - 320}" y="98" width="200" height="28" rx="14" fill="url(#acc)" opacity="0.9" />
+  ${blocks.join('\n')}
+  <text x="92" y="178" fill="rgba(229,231,235,0.86)" font-family="ui-sans-serif, system-ui" font-size="18" font-weight="700">${title}</text>
+  <text x="92" y="210" fill="rgba(229,231,235,0.68)" font-family="ui-monospace" font-size="14">Step ${step} · ${new Date().toISOString()}</text>
+  <text x="${w - 96}" y="${h - 62}" fill="rgba(229,231,235,0.72)" font-family="ui-monospace" font-size="12" text-anchor="end">mock stream</text>
+</svg>`
+        return `data:image/svg+xml;charset=utf-8,${encodeURIComponent(s)}`
+      }
+
+      const store = {
+        view: 'tasks',
+        mode: 'auto',
+        ws: { connected: false },
+        tasks: [
+          {
+            id: 'task_' + uid(),
+            name: '电商核心购买流程测试',
+            url: 'https://shop.example.com',
+            objective: '搜索MacBook，加入购物车并结算，不进行最终付款',
+            constraints: { max_steps: 18, forbidden_domains: ['stripe.com', 'alipay.com'] },
+            updatedAt: new Date(Date.now() - 1000 * 60 * 18)
+          },
+          {
+            id: 'task_' + uid(),
+            name: 'B2B 登录与搜索验证',
+            url: 'https://b2b.example.com',
+            objective: '登录后搜索订单，验证列表展示与筛选可用',
+            constraints: { max_steps: 14, forbidden_domains: ['prod.internal'] },
+            updatedAt: new Date(Date.now() - 1000 * 60 * 62)
+          }
+        ],
+        instances: [],
+        selectedTaskId: null,
+        selectedInstanceId: null,
+        running: { timer: null },
+        hil: { ticket: null, open: false },
+        report: { last: null },
+        ui: {
+          leftPage: 0,
+          logPage: 0,
+          tlPage: 0,
+          defPage: 0,
+          repTlPage: 0
+        },
+        logs: []
+      }
+
+      const PAGE = {
+        left: 6,
+        logs: 10,
+        timeline: 6,
+        defects: 4
+      }
+
+      const mkInstance = (taskId) => {
+        return {
+          id: 'inst_' + uid(),
+          taskId,
+          status: 'PENDING',
+          createdAt: new Date(),
+          startedAt: null,
+          completedAt: null,
+          steps: [],
+          hilCount: 0,
+          defects: []
+        }
+      }
+
+      const byId = (arr, id) => arr.find((x) => x.id === id)
+
+      const currentTask = () => byId(store.tasks, store.selectedTaskId)
+      const currentInstance = () => byId(store.instances, store.selectedInstanceId)
+
+      const setActiveNav = (key) => {
+        $$('#nav button').forEach((b) => {
+          b.dataset.active = String(b.dataset.nav === key)
+        })
+      }
+
+      const setView = (key) => {
+        store.view = key
+        setActiveNav(key)
+        const titleMap = {
+          tasks: ['任务', '选择任务与实例，进入 Live Console 观察视觉感知过程'],
+          live: ['实例 Live Console', '截图推流 + 标注层 + 动作卡 + 日志 + 时间线（mock）'],
+          hil: ['HIL 工单', '当命中风险规则或低置信度时触发阻断，人工确认后恢复执行'],
+          report: ['报告回放', '每一步的截图/标注/动作/验证结果可回放与导出']
+        }
+        const t = titleMap[key] || ['Demo', '']
+        $('#topTitle').textContent = t[0]
+        $('#topDesc').textContent = t[1]
+
+        const right = $('#panelRight')
+        const left = $('#panelLeft')
+        left.style.display = ''
+        right.style.display = ''
+
+        if (key === 'tasks') {
+          setRightMode('live')
+        }
+        if (key === 'live') {
+          setRightMode('live')
+        }
+        if (key === 'report') {
+          setRightMode('report')
+          ensureReportFromInstance()
+        }
+        if (key === 'hil') {
+          if (store.hil.ticket) {
+            openHilDrawer()
+          } else {
+            pushLog('INFO', '当前没有待处理的 HIL 工单')
+          }
+          setRightMode('live')
+        }
+
+        syncButtons()
+      }
+
+      const setRightMode = (mode) => {
+        $('#viewLive').style.display = mode === 'live' ? '' : 'none'
+        $('#viewReport').style.display = mode === 'report' ? '' : 'none'
+      }
+
+      const syncPills = () => {
+        $('#pillTasks').textContent = String(store.tasks.length)
+        const liveCount = store.instances.filter((x) => x.status === 'RUNNING' || x.status === 'PAUSED_HIL').length
+        $('#pillLive').textContent = String(liveCount)
+        const hilCount = store.hil.ticket ? 1 : 0
+        $('#pillHil').textContent = String(hilCount)
+        const repCount = store.report.last ? 1 : 1
+        $('#pillReport').textContent = String(repCount)
+      }
+
+      const syncButtons = () => {
+        const inst = currentInstance()
+        const canStart = Boolean(inst) && (inst.status === 'PENDING' || inst.status === 'FAILED' || inst.status === 'SUCCESS')
+        const canPause = Boolean(inst) && inst.status === 'RUNNING'
+        const canStop = Boolean(inst) && (inst.status === 'RUNNING' || inst.status === 'PAUSED_HIL')
+        $('#btnStart').disabled = !canStart
+        $('#btnPause').disabled = !canPause
+        $('#btnStop').disabled = !canStop
+      }
+
+      const renderTasks = () => {
+        const el = $('#taskList')
+        el.innerHTML = ''
+        const isActive = ($('#leftSeg button[data-active="true"]')?.dataset.left || 'tasks') === 'tasks'
+        const items = store.tasks
+          .slice()
+          .sort((a, b) => b.updatedAt.getTime() - a.updatedAt.getTime())
+
+        const pageSize = PAGE.left
+        const pageCount = Math.max(1, Math.ceil(items.length / pageSize))
+        store.ui.leftPage = clamp(store.ui.leftPage, 0, pageCount - 1)
+        const start = store.ui.leftPage * pageSize
+        const end = start + pageSize
+
+        if (isActive) {
+          $('#leftPagerHint').textContent = `任务 · 第 ${store.ui.leftPage + 1}/${pageCount} 页`
+          $('#btnLeftPrev').disabled = store.ui.leftPage <= 0
+          $('#btnLeftNext').disabled = store.ui.leftPage >= pageCount - 1
+        }
+
+        items.slice(start, end).forEach((t) => {
+            const card = document.createElement('div')
+            card.className = 'card'
+            card.dataset.active = String(t.id === store.selectedTaskId)
+            card.innerHTML = `
+              <div class="row">
+                <div class="left" style="min-width:0">
+                  <div class="v">${escapeHtml(t.name)}</div>
+                  <div class="k" title="${escapeHtml(t.url)}">${escapeHtml(t.url)}</div>
+                </div>
+                <div class="badge info">TASK</div>
+              </div>
+              <div class="row">
+                <div class="k">Objective</div>
+                <div class="k">更新 ${fmtTime(t.updatedAt)}</div>
+              </div>
+              <div class="k" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${escapeHtml(t.objective)}</div>
+            `
+            card.addEventListener('click', () => {
+              store.selectedTaskId = t.id
+              if (!store.instances.some((x) => x.taskId === t.id)) {
+                const inst = mkInstance(t.id)
+                store.instances.unshift(inst)
+              }
+              store.selectedInstanceId = store.instances.find((x) => x.taskId === t.id)?.id || null
+              renderAll()
+            })
+            el.appendChild(card)
+          })
+      }
+
+      const renderInstances = () => {
+        const el = $('#instanceList')
+        el.innerHTML = ''
+        const isActive = ($('#leftSeg button[data-active="true"]')?.dataset.left || 'tasks') === 'instances'
+        const taskId = store.selectedTaskId
+        const items = store.instances.filter((x) => (taskId ? x.taskId === taskId : true)).slice()
+        items.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime())
+
+        const pageSize = PAGE.left
+        const pageCount = Math.max(1, Math.ceil(items.length / pageSize))
+        store.ui.leftPage = clamp(store.ui.leftPage, 0, pageCount - 1)
+        const start = store.ui.leftPage * pageSize
+        const end = start + pageSize
+
+        if (isActive) {
+          $('#leftPagerHint').textContent = `实例 · 第 ${store.ui.leftPage + 1}/${pageCount} 页`
+          $('#btnLeftPrev').disabled = store.ui.leftPage <= 0
+          $('#btnLeftNext').disabled = store.ui.leftPage >= pageCount - 1
+        }
+
+        items.slice(start, end).forEach((inst) => {
+          const card = document.createElement('div')
+          card.className = 'card'
+          card.dataset.active = String(inst.id === store.selectedInstanceId)
+          const bcls = badgeClassByStatus(inst.status)
+          card.innerHTML = `
+            <div class="row">
+              <div class="left" style="min-width:0">
+                <div class="v">${escapeHtml(inst.id)}</div>
+                <div class="k">创建 ${fmtTime(inst.createdAt)}</div>
+              </div>
+              <div class="badge ${bcls}">${escapeHtml(inst.status)}</div>
+            </div>
+            <div class="row">
+              <div class="k">步数 ${inst.steps.length}</div>
+              <div class="k">HIL ${inst.hilCount}</div>
+            </div>
+          `
+          card.addEventListener('click', () => {
+            store.selectedInstanceId = inst.id
+            renderAll()
+          })
+          el.appendChild(card)
+        })
+      }
+
+      const renderLeftSeg = () => {
+        const mode = $('#leftSeg button[data-active="true"]')?.dataset.left || 'tasks'
+        $('#taskList').style.display = mode === 'tasks' ? '' : 'none'
+        $('#instanceList').style.display = mode === 'instances' ? '' : 'none'
+        $('#leftPager').style.display = ''
+      }
+
+      const renderSummary = () => {
+        const inst = currentInstance()
+        if (!inst) {
+          $('#mStatus').textContent = 'Idle'
+          $('#mStep').textContent = '0'
+          $('#mHil').textContent = '0'
+          $('#mDef').textContent = '0'
+          return
+        }
+        $('#mStatus').textContent = inst.status
+        $('#mStep').textContent = String(inst.steps.length)
+        $('#mHil').textContent = String(inst.hilCount)
+        $('#mDef').textContent = String(inst.defects.length)
+      }
+
+      const pushLog = (lvl, msg) => {
+        store.logs.push({ lvl, msg: `[${fmtTime(new Date())}] ${msg}` })
+        renderLogs()
+      }
+
+      const renderLogs = () => {
+        const el = $('#log')
+        el.innerHTML = ''
+        const total = store.logs.length
+        const pageSize = PAGE.logs
+        const pageCount = Math.max(1, Math.ceil(total / pageSize))
+        store.ui.logPage = clamp(store.ui.logPage, 0, pageCount - 1)
+        const start = total - (store.ui.logPage + 1) * pageSize
+        const end = total - store.ui.logPage * pageSize
+        const slice = store.logs.slice(Math.max(0, start), Math.max(0, end))
+
+        slice.forEach((l) => {
+          const line = document.createElement('div')
+          line.className = 'line'
+          const lvlCls = l.lvl === 'ERROR' ? 'error' : l.lvl === 'WARN' ? 'warn' : 'info'
+          line.innerHTML = `<span class="lvl ${lvlCls}">${escapeHtml(l.lvl)}</span><span class="msg">${escapeHtml(l.msg)}</span>`
+          el.appendChild(line)
+        })
+
+        $('#logRight').textContent = `${total} 行 · 第 ${pageCount - store.ui.logPage}/${pageCount} 页`
+        $('#btnLogPrev').disabled = store.ui.logPage >= pageCount - 1
+        $('#btnLogNext').disabled = store.ui.logPage <= 0
+      }
+
+      const renderTimeline = () => {
+        const inst = currentInstance()
+        const el = $('#timeline')
+        el.innerHTML = ''
+        if (!inst) {
+          $('#tlRight').textContent = '0 步'
+          return
+        }
+        const total = inst.steps.length
+        const pageSize = PAGE.timeline
+        const pageCount = Math.max(1, Math.ceil(total / pageSize))
+        store.ui.tlPage = clamp(store.ui.tlPage, 0, pageCount - 1)
+        const start = total - (store.ui.tlPage + 1) * pageSize
+        const end = total - store.ui.tlPage * pageSize
+        const slice = inst.steps.slice(Math.max(0, start), Math.max(0, end))
+
+        slice.forEach((s) => {
+          const div = document.createElement('div')
+          div.className = 'step'
+          div.dataset.active = String(s.no === inst.activeStepNo)
+          div.innerHTML = `
+            <div class="n">${s.no}</div>
+            <div class="m">
+              <div class="a">${escapeHtml(s.node)} · ${escapeHtml(s.action.action_type)}</div>
+              <div class="b">${escapeHtml(s.action.expected_result || '-')}</div>
+            </div>
+            <div class="badge ${s.verify && s.verify.isSuccess ? 'success' : s.verify && s.verify.isDefect ? 'danger' : 'info'}">${escapeHtml(s.verify ? (s.verify.isSuccess ? 'PASS' : s.verify.isDefect ? 'FAIL' : 'INFO') : 'PENDING')}</div>
+          `
+          div.addEventListener('click', () => {
+            inst.activeStepNo = s.no
+            applyStepToLive(s)
+            renderTimeline()
+          })
+          el.appendChild(div)
+        })
+        $('#tlRight').textContent = `${total} 步 · 第 ${pageCount - store.ui.tlPage}/${pageCount} 页`
+        $('#btnTlPrev').disabled = store.ui.tlPage >= pageCount - 1
+        $('#btnTlNext').disabled = store.ui.tlPage <= 0
+      }
+
+      const drawOverlay = (canvas, img, overlay) => {
+        const ctx = canvas.getContext('2d')
+        const rect = img.getBoundingClientRect()
+        canvas.width = Math.max(1, Math.floor(rect.width))
+        canvas.height = Math.max(1, Math.floor(rect.height))
+        ctx.clearRect(0, 0, canvas.width, canvas.height)
+
+        if (!overlay) return
+
+        const baseW = overlay.baseW || 1280
+        const baseH = overlay.baseH || 720
+
+        const fit = containFit(rect.width, rect.height, baseW, baseH)
+        const ox = (rect.width - fit.w) / 2
+        const oy = (rect.height - fit.h) / 2
+
+        ctx.save()
+        ctx.translate(ox, oy)
+        ctx.scale(fit.w / baseW, fit.h / baseH)
+
+        const boxes = Array.isArray(overlay.boxes) ? overlay.boxes : []
+        boxes.forEach((b, idx) => {
+          const alpha = idx === 0 ? 0.95 : 0.55
+          ctx.lineWidth = idx === 0 ? 3 : 2
+          ctx.strokeStyle = idx === 0 ? `rgba(59,130,246,${alpha})` : `rgba(6,182,212,${alpha})`
+          ctx.fillStyle = idx === 0 ? `rgba(59,130,246,0.12)` : `rgba(6,182,212,0.10)`
+          ctx.beginPath()
+          ctx.roundRect(b.x, b.y, b.w, b.h, 10)
+          ctx.fill()
+          ctx.stroke()
+        })
+
+        if (overlay.point) {
+          const { x, y } = overlay.point
+          ctx.strokeStyle = 'rgba(245,158,11,0.95)'
+          ctx.lineWidth = 2
+          ctx.beginPath()
+          ctx.arc(x, y, 10, 0, Math.PI * 2)
+          ctx.stroke()
+          ctx.beginPath()
+          ctx.moveTo(x - 18, y)
+          ctx.lineTo(x + 18, y)
+          ctx.moveTo(x, y - 18)
+          ctx.lineTo(x, y + 18)
+          ctx.stroke()
+        }
+
+        ctx.restore()
+      }
+
+      const containFit = (cw, ch, iw, ih) => {
+        const cr = cw / ch
+        const ir = iw / ih
+        if (ir > cr) {
+          const w = cw
+          const h = cw / ir
+          return { w, h }
+        }
+        const h = ch
+        const w = ch * ir
+        return { w, h }
+      }
+
+      const setActionCard = (action, verify) => {
+        if (!action) {
+          $('#actionBadge').className = 'badge info'
+          $('#actionBadge').textContent = 'READY'
+          $('#acThought').textContent = '选择实例后开始推流'
+          $('#acAction').textContent = '-'
+          $('#acConf').textContent = '-'
+          $('#acExpected').textContent = '-'
+          return
+        }
+        const conf = Number(action.confidence || 0)
+        const badge = $('#actionBadge')
+        if (verify && verify.isDefect) {
+          badge.className = 'badge danger'
+          badge.textContent = 'FAIL'
+        } else if (action.action_type === 'end') {
+          badge.className = 'badge success'
+          badge.textContent = 'END'
+        } else if (conf < 0.8) {
+          badge.className = 'badge warning'
+          badge.textContent = 'LOW_CONF'
+        } else {
+          badge.className = 'badge info'
+          badge.textContent = 'PROPOSED'
+        }
+        $('#acThought').textContent = action.thought || '-'
+        $('#acAction').textContent = JSON.stringify({ action_type: action.action_type, target: action.target, params: action.params }, null, 0)
+        $('#acConf').textContent = conf ? `${Math.round(conf * 100)}%` : '-'
+        $('#acExpected').textContent = action.expected_result || '-'
+      }
+
+      const applyStepToLive = (step) => {
+        const img = $('#liveShot')
+        img.src = step.screenshot
+        img.onload = () => drawOverlay($('#overlay'), img, step.overlay)
+        setActionCard(step.action, step.verify)
+      }
+
+      const applyStepToReport = (step) => {
+        const img = $('#repShot')
+        img.src = step.screenshot
+        img.onload = () => drawOverlay($('#repOverlay'), img, step.overlay)
+      }
+
+      const openHilDrawer = () => {
+        store.hil.open = true
+        const t = store.hil.ticket
+        if (!t) return
+        $('#hilDrawer').dataset.open = 'true'
+        $('#hilMeta').textContent = `${t.status} · ${t.ticketId}`
+        $('#hilReason').textContent = t.reason
+        const risk = $('#hilRisk')
+        risk.textContent = t.risk
+        risk.className = `badge ${t.risk === 'HIGH' ? 'danger' : t.risk === 'MEDIUM' ? 'warning' : 'info'}`
+        const fullJson = JSON.stringify(t.plannedAction, null, 2)
+        const lines = fullJson.split('\n')
+        const clipped = lines.slice(0, 12).join('\n') + (lines.length > 12 ? '\n…' : '')
+        $('#hilJson').textContent = clipped
+        $('#hilShot').src = t.screenshot
+        $('#hilShot').onload = () => drawOverlay($('#hilOverlay'), $('#hilShot'), t.overlay)
+        $('#modifyArea').style.display = 'none'
+      }
+
+      const closeHilDrawer = () => {
+        store.hil.open = false
+        $('#hilDrawer').dataset.open = 'false'
+      }
+
+      const createHilTicket = (inst, reason, risk, plannedAction, screenshot, overlay) => {
+        const ticket = {
+          ticketId: 'hil_' + uid(),
+          status: 'WAITING',
+          instanceId: inst.id,
+          reason,
+          risk,
+          plannedAction,
+          screenshot,
+          overlay
+        }
+        store.hil.ticket = ticket
+        inst.status = 'PAUSED_HIL'
+        inst.hilCount += 1
+        pushLog('WARN', `触发 HIL：${reason}（${risk}）`)
+        syncPills()
+        syncButtons()
+        openHilDrawer()
+      }
+
+      const resumeFromHil = (decision, modifiedAction) => {
+        const ticket = store.hil.ticket
+        if (!ticket) return
+        const inst = byId(store.instances, ticket.instanceId)
+        if (!inst) return
+
+        ticket.status = decision === 'approve' ? 'APPROVED' : decision === 'reject' ? 'REJECTED' : 'MODIFIED'
+        if (decision === 'reject') {
+          inst.status = 'FAILED'
+          inst.completedAt = new Date()
+          pushLog('ERROR', '实例已终止（人工拒绝）')
+          store.hil.ticket = null
+          closeHilDrawer()
+          finalizeReport(inst)
+          renderAll()
+          return
+        }
+
+        if (decision === 'modify' && modifiedAction) {
+          ticket.plannedAction = { ...ticket.plannedAction, ...modifiedAction }
+          pushLog('INFO', `人工修改动作：${JSON.stringify(modifiedAction)}`)
+        } else {
+          pushLog('INFO', '人工批准继续执行')
+        }
+
+        store.hil.ticket = null
+        closeHilDrawer()
+        inst.status = 'RUNNING'
+        syncPills()
+        syncButtons()
+      }
+
+      const ensureDefaultSelection = () => {
+        if (!store.selectedTaskId && store.tasks.length) {
+          store.selectedTaskId = store.tasks[0].id
+        }
+        if (!store.instances.some((x) => x.taskId === store.selectedTaskId)) {
+          store.instances.unshift(mkInstance(store.selectedTaskId))
+        }
+        if (!store.selectedInstanceId) {
+          const inst = store.instances.find((x) => x.taskId === store.selectedTaskId)
+          store.selectedInstanceId = inst ? inst.id : null
+        }
+      }
+
+      const escapeHtml = (s) => {
+        return String(s)
+          .replaceAll('&', '&amp;')
+          .replaceAll('<', '&lt;')
+          .replaceAll('>', '&gt;')
+          .replaceAll('"', '&quot;')
+          .replaceAll("'", '&#039;')
+      }
+
+      const renderReport = () => {
+        const inst = currentInstance()
+        if (!inst) return
+
+        const rep = store.report.last
+        if (!rep || rep.instanceId !== inst.id) {
+          $('#repBadge').className = 'badge info'
+          $('#repBadge').textContent = 'DRAFT'
+          $('#repVerdict').textContent = '暂无报告（请先运行一次实例）'
+          $('#repDefects').textContent = '-'
+          $('#repHil').textContent = '-'
+          $('#defList').innerHTML = '<div class="muted">暂无缺陷</div>'
+          $('#defRight').textContent = '0 条'
+          $('#btnDefPrev').disabled = true
+          $('#btnDefNext').disabled = true
+          $('#repTimeline').innerHTML = ''
+          $('#repTlRight').textContent = '0 步'
+          $('#btnRepTlPrev').disabled = true
+          $('#btnRepTlNext').disabled = true
+          return
+        }
+
+        const ok = rep.verdict === 'SUCCESS'
+        $('#repBadge').className = `badge ${ok ? 'success' : 'danger'}`
+        $('#repBadge').textContent = rep.verdict
+        $('#repVerdict').textContent = ok ? '通过（mock）' : '失败（mock）'
+        $('#repDefects').textContent = String(rep.defects.length)
+        $('#repHil').textContent = String(rep.hilCount)
+
+        const defEl = $('#defList')
+        defEl.innerHTML = ''
+        {
+          const total = rep.defects.length
+          const pageSize = PAGE.defects
+          const pageCount = Math.max(1, Math.ceil(total / pageSize))
+          store.ui.defPage = clamp(store.ui.defPage, 0, pageCount - 1)
+          const start = store.ui.defPage * pageSize
+          const end = start + pageSize
+          const slice = rep.defects.slice(start, end)
+
+          if (!total) {
+            defEl.innerHTML = '<div class="muted">暂无缺陷</div>'
+          } else {
+            slice.forEach((d) => {
+              const c = document.createElement('div')
+              c.className = 'card'
+              c.style.cursor = 'default'
+              c.innerHTML = `
+                <div class="row">
+                  <div class="left">
+                    <div class="v">Step ${d.stepNo} · ${escapeHtml(d.title)}</div>
+                    <div class="k">${escapeHtml(d.detail)}</div>
+                  </div>
+                  <div class="badge danger">FAIL</div>
+                </div>
+              `
+              defEl.appendChild(c)
+            })
+          }
+
+          $('#defRight').textContent = `${total} 条 · 第 ${store.ui.defPage + 1}/${pageCount} 页`
+          $('#btnDefPrev').disabled = store.ui.defPage <= 0
+          $('#btnDefNext').disabled = store.ui.defPage >= pageCount - 1
+        }
+
+        const tl = $('#repTimeline')
+        tl.innerHTML = ''
+        {
+          const total = rep.steps.length
+          const pageSize = PAGE.timeline
+          const pageCount = Math.max(1, Math.ceil(total / pageSize))
+          store.ui.repTlPage = clamp(store.ui.repTlPage, 0, pageCount - 1)
+          const start = total - (store.ui.repTlPage + 1) * pageSize
+          const end = total - store.ui.repTlPage * pageSize
+          const slice = rep.steps.slice(Math.max(0, start), Math.max(0, end))
+
+          slice.forEach((s) => {
+          const div = document.createElement('div')
+          div.className = 'step'
+          div.dataset.active = String(s.no === rep.activeStepNo)
+          div.innerHTML = `
+            <div class="n">${s.no}</div>
+            <div class="m">
+              <div class="a">${escapeHtml(s.node)} · ${escapeHtml(s.action.action_type)}</div>
+              <div class="b">${escapeHtml(s.action.expected_result || '-')}</div>
+            </div>
+            <div class="badge ${s.verify && s.verify.isSuccess ? 'success' : s.verify && s.verify.isDefect ? 'danger' : 'info'}">${escapeHtml(s.verify ? (s.verify.isSuccess ? 'PASS' : s.verify.isDefect ? 'FAIL' : 'INFO') : 'PENDING')}</div>
+          `
+          div.addEventListener('click', () => {
+            rep.activeStepNo = s.no
+            applyStepToReport(s)
+            renderReport()
+          })
+          tl.appendChild(div)
+          })
+
+          $('#repTlRight').textContent = `${total} 步 · 第 ${pageCount - store.ui.repTlPage}/${pageCount} 页`
+          $('#btnRepTlPrev').disabled = store.ui.repTlPage >= pageCount - 1
+          $('#btnRepTlNext').disabled = store.ui.repTlPage <= 0
+        }
+
+        const first = rep.steps[rep.steps.length - 1] || rep.steps[0]
+        const active = rep.steps.find((x) => x.no === rep.activeStepNo) || first
+        if (active) applyStepToReport(active)
+      }
+
+      const ensureReportFromInstance = () => {
+        const inst = currentInstance()
+        if (!inst) return
+        if (store.report.last && store.report.last.instanceId === inst.id) return
+        if (inst.completedAt) finalizeReport(inst)
+      }
+
+      const finalizeReport = (inst) => {
+        const verdict = inst.status === 'SUCCESS' ? 'SUCCESS' : inst.status === 'FAILED' ? 'FAILED' : 'DRAFT'
+        store.report.last = {
+          reportId: 'rep_' + uid(),
+          instanceId: inst.id,
+          verdict,
+          hilCount: inst.hilCount,
+          defects: inst.defects.slice(),
+          steps: inst.steps.slice(),
+          activeStepNo: inst.steps.length ? inst.steps[inst.steps.length - 1].no : 1
+        }
+        syncPills()
+      }
+
+      const startStream = () => {
+        const inst = currentInstance()
+        const task = currentTask()
+        if (!inst || !task) return
+
+        if (store.running.timer) return
+
+        store.ws.connected = true
+        $('#streamHint').textContent = 'WS: connected'
+
+        inst.status = 'RUNNING'
+        inst.startedAt = new Date()
+        inst.completedAt = null
+        inst.steps = []
+        inst.defects = []
+        inst.hilCount = 0
+        inst.activeStepNo = undefined
+        store.logs = []
+        store.ui.logPage = 0
+        store.ui.tlPage = 0
+        store.ui.defPage = 0
+        store.ui.repTlPage = 0
+        pushLog('INFO', `实例开始：${inst.id}`)
+        pushLog('INFO', `目标：${task.url}`)
+        pushLog('INFO', `Objective：${task.objective}`)
+
+        const cfg = {
+          maxSteps: clamp(Number(task.constraints?.max_steps || 18), 6, 40)
+        }
+
+        syncPills()
+        renderAll()
+
+        let i = 0
+        const tick = () => {
+          if (!currentInstance() || currentInstance().id !== inst.id) return
+          if (inst.status !== 'RUNNING') return
+
+          i += 1
+          const stepNo = i
+          const node = stepNo === 1 ? 'init' : stepNo % 4 === 0 ? 'verify' : stepNo % 4 === 3 ? 'execute' : 'explore'
+          const title = `Sandbox · ${task.name}`
+          const screenshot = mkSvgShot({ step: stepNo, title })
+
+          const baseW = 1280
+          const baseH = 720
+          const bx = clamp(120 + Math.floor(Math.random() * 880), 80, 1040)
+          const by = clamp(120 + Math.floor(Math.random() * 440), 90, 560)
+          const bw = clamp(120 + Math.floor(Math.random() * 240), 100, 420)
+          const bh = clamp(46 + Math.floor(Math.random() * 120), 36, 220)
+          const overlay = {
+            baseW,
+            baseH,
+            boxes: [
+              { x: bx, y: by, w: bw, h: bh },
+              { x: clamp(bx + 12, 0, baseW - 20), y: clamp(by + 10, 0, baseH - 20), w: clamp(bw - 24, 20, baseW), h: clamp(bh - 20, 20, baseH) }
+            ],
+            point: { x: clamp(bx + Math.floor(bw * 0.55), 0, baseW), y: clamp(by + Math.floor(bh * 0.55), 0, baseH) }
+          }
+
+          const actionTypes = ['click', 'type', 'scroll', 'wait']
+          const at = stepNo >= cfg.maxSteps ? 'end' : actionTypes[stepNo % actionTypes.length]
+
+          const confBase = store.mode === 'safe' ? 0.86 : store.mode === 'hil' ? 0.78 : 0.82
+          const conf = at === 'end' ? 0.99 : clamp(confBase + (Math.random() * 0.18 - 0.09), 0.45, 0.98)
+          const plannedAction = {
+            thought:
+              at === 'click'
+                ? '我识别到可交互按钮，准备点击以推进流程。'
+                : at === 'type'
+                  ? '我识别到输入框，准备输入关键字并提交。'
+                  : at === 'scroll'
+                    ? '页面信息较多，滚动以寻找下一步入口。'
+                    : at === 'wait'
+                      ? '等待页面加载稳定后再继续。'
+                      : '满足终止条件，准备结束并生成报告。',
+            action_type: at,
+            target:
+              at === 'scroll'
+                ? { selector: null, x: null, y: null, bbox: { x: bx, y: by, w: bw, h: bh } }
+                : { x: overlay.point.x, y: overlay.point.y, bbox: { x: bx, y: by, w: bw, h: bh } },
+            params: at === 'type' ? { text: stepNo % 2 === 0 ? 'MacBook' : '订单' } : at === 'scroll' ? { direction: 'down' } : {},
+            confidence: conf,
+            expected_result:
+              at === 'click'
+                ? '页面出现下一步组件或按钮状态变化'
+                : at === 'type'
+                  ? '输入完成并出现搜索结果'
+                  : at === 'scroll'
+                    ? '展示更多可交互区域'
+                    : at === 'wait'
+                      ? '加载完成且页面稳定'
+                      : '报告生成并展示摘要'
+          }
+
+          const hilTrigger =
+            store.mode === 'hil'
+              ? at !== 'end' && (conf < 0.86 || stepNo % 5 === 0)
+              : at !== 'end' && (conf < 0.72 || stepNo === 7)
+
+          const highRisk = at === 'click' && stepNo % 9 === 0
+
+          const step = {
+            no: stepNo,
+            node,
+            screenshot,
+            overlay,
+            action: plannedAction,
+            verify: null,
+            ts: new Date()
+          }
+
+          inst.steps.push(step)
+          inst.activeStepNo = stepNo
+          applyStepToLive(step)
+          renderTimeline()
+          renderSummary()
+
+          pushLog('INFO', `step ${stepNo} · ${node} · action=${plannedAction.action_type} · conf=${Math.round(conf * 100)}%`)
+
+          if (highRisk) {
+            createHilTicket(inst, '检测到高风险点击（模拟：支付/删除入口）', 'HIGH', plannedAction, screenshot, overlay)
+            syncButtons()
+            renderAll()
+            return
+          }
+
+          if (hilTrigger) {
+            createHilTicket(inst, '低置信度或策略命中（模拟）', conf < 0.75 ? 'MEDIUM' : 'LOW', plannedAction, screenshot, overlay)
+            syncButtons()
+            renderAll()
+            return
+          }
+
+          const verifyOk = at === 'end' ? true : Math.random() > 0.12
+          const isDefect = !verifyOk && Math.random() > 0.4
+          step.verify = {
+            isSuccess: verifyOk,
+            isDefect,
+            msg: verifyOk ? '视觉断言通过（mock）' : isDefect ? '视觉断言失败：页面未呈现期望状态（mock）' : '可重试（mock）'
+          }
+          setActionCard(plannedAction, step.verify)
+          if (!verifyOk) {
+            pushLog(isDefect ? 'ERROR' : 'WARN', step.verify.msg)
+          }
+
+          if (isDefect) {
+            inst.defects.push({ stepNo, title: '断言不满足', detail: step.verify.msg })
+            renderSummary()
+          }
+
+          if (at === 'end' || stepNo >= cfg.maxSteps) {
+            inst.status = inst.defects.length ? 'FAILED' : 'SUCCESS'
+            inst.completedAt = new Date()
+            pushLog('INFO', `实例结束：${inst.status}`)
+            stopStreamInternal(false)
+            finalizeReport(inst)
+            renderAll()
+            return
+          }
+        }
+
+        store.running.timer = window.setInterval(tick, 1150)
+
+        $('#btnPause').disabled = false
+        $('#btnStop').disabled = false
+        $('#btnStart').disabled = true
+        syncPills()
+        renderAll()
+      }
+
+      const stopStreamInternal = (byUser) => {
+        if (store.running.timer) {
+          window.clearInterval(store.running.timer)
+          store.running.timer = null
+        }
+        store.ws.connected = false
+        $('#streamHint').textContent = 'WS: disconnected'
+        if (byUser) pushLog('WARN', '推流已停止（手动）')
+        syncButtons()
+        syncPills()
+      }
+
+      const pauseStream = () => {
+        const inst = currentInstance()
+        if (!inst || inst.status !== 'RUNNING') return
+        inst.status = 'PAUSED_HIL'
+        pushLog('WARN', '实例已暂停（模拟）')
+        syncButtons()
+        renderAll()
+      }
+
+      const stopStream = () => {
+        const inst = currentInstance()
+        if (!inst) return
+        inst.status = 'FAILED'
+        inst.completedAt = new Date()
+        stopStreamInternal(true)
+        finalizeReport(inst)
+        renderAll()
+      }
+
+      const renderAll = () => {
+        ensureDefaultSelection()
+        renderTasks()
+        renderInstances()
+        renderLeftSeg()
+        renderSummary()
+        renderTimeline()
+        renderLogs()
+        syncButtons()
+        syncPills()
+        if (store.view === 'report') renderReport()
+
+        const inst = currentInstance()
+        if (!inst || !inst.steps.length) {
+          const img = $('#liveShot')
+          img.src = mkSvgShot({ step: 0, title: '等待开始推流', accent: '#06B6D4' })
+          img.onload = () => drawOverlay($('#overlay'), img, null)
+        }
+      }
+
+      const bindUI = () => {
+        $('#nav').addEventListener('click', (e) => {
+          const btn = e.target.closest('button[data-nav]')
+          if (!btn) return
+          setView(btn.dataset.nav)
+        })
+
+        $('#leftSeg').addEventListener('click', (e) => {
+          const btn = e.target.closest('button[data-left]')
+          if (!btn) return
+          $$('#leftSeg button').forEach((b) => (b.dataset.active = String(b === btn)))
+          store.ui.leftPage = 0
+          renderAll()
+        })
+
+        $('#modeSeg').addEventListener('click', (e) => {
+          const btn = e.target.closest('button[data-mode]')
+          if (!btn) return
+          store.mode = btn.dataset.mode
+          $$('#modeSeg button').forEach((b) => (b.dataset.active = String(b === btn)))
+          pushLog('INFO', `执行模式切换：${store.mode}`)
+        })
+
+        $('#btnNewTask').addEventListener('click', () => {
+          const t = {
+            id: 'task_' + uid(),
+            name: '新任务（mock）' + Math.floor(Math.random() * 100),
+            url: 'https://app.example.com',
+            objective: '登录后进入设置页，验证保存按钮可用',
+            constraints: { max_steps: 16, forbidden_domains: ['prod.internal'] },
+            updatedAt: new Date()
+          }
+          store.tasks.unshift(t)
+          store.selectedTaskId = t.id
+          store.instances.unshift(mkInstance(t.id))
+          store.selectedInstanceId = store.instances[0].id
+          pushLog('INFO', `已创建任务：${t.name}`)
+          renderAll()
+        })
+
+        $('#btnStart').addEventListener('click', () => {
+          setView('live')
+          startStream()
+        })
+
+        $('#btnPause').addEventListener('click', () => {
+          pauseStream()
+        })
+
+        $('#btnStop').addEventListener('click', () => {
+          stopStream()
+        })
+
+        $('#btnHilClose').addEventListener('click', () => closeHilDrawer())
+
+        $('#btnHilCopy').addEventListener('click', async () => {
+          const t = store.hil.ticket
+          if (!t) return
+          const fullJson = JSON.stringify(t.plannedAction, null, 2)
+          try {
+            await navigator.clipboard.writeText(fullJson)
+            pushLog('INFO', '已复制 HIL 动作 JSON')
+          } catch {
+            pushLog('WARN', '复制失败：浏览器未授予剪贴板权限')
+          }
+        })
+
+        $('#btnLeftPrev').addEventListener('click', () => {
+          store.ui.leftPage = Math.max(0, store.ui.leftPage - 1)
+          renderAll()
+        })
+
+        $('#btnLeftNext').addEventListener('click', () => {
+          store.ui.leftPage += 1
+          renderAll()
+        })
+
+        $('#btnLogPrev').addEventListener('click', () => {
+          store.ui.logPage += 1
+          renderLogs()
+        })
+
+        $('#btnLogNext').addEventListener('click', () => {
+          store.ui.logPage = Math.max(0, store.ui.logPage - 1)
+          renderLogs()
+        })
+
+        $('#btnTlPrev').addEventListener('click', () => {
+          store.ui.tlPage += 1
+          renderTimeline()
+        })
+
+        $('#btnTlNext').addEventListener('click', () => {
+          store.ui.tlPage = Math.max(0, store.ui.tlPage - 1)
+          renderTimeline()
+        })
+
+        $('#btnDefPrev').addEventListener('click', () => {
+          store.ui.defPage += 1
+          renderReport()
+        })
+
+        $('#btnDefNext').addEventListener('click', () => {
+          store.ui.defPage = Math.max(0, store.ui.defPage - 1)
+          renderReport()
+        })
+
+        $('#btnRepTlPrev').addEventListener('click', () => {
+          store.ui.repTlPage += 1
+          renderReport()
+        })
+
+        $('#btnRepTlNext').addEventListener('click', () => {
+          store.ui.repTlPage = Math.max(0, store.ui.repTlPage - 1)
+          renderReport()
+        })
+
+        $('#btnHilApprove').addEventListener('click', () => {
+          resumeFromHil('approve')
+          const inst = currentInstance()
+          if (inst && inst.status === 'RUNNING') {
+            syncButtons()
+          }
+        })
+
+        $('#btnHilReject').addEventListener('click', () => {
+          stopStreamInternal(false)
+          resumeFromHil('reject')
+        })
+
+        $('#btnHilModify').addEventListener('click', () => {
+          const t = store.hil.ticket
+          if (!t) return
+          const pt = t.plannedAction?.target
+          const x = pt?.x ?? t.overlay?.point?.x ?? 0
+          const y = pt?.y ?? t.overlay?.point?.y ?? 0
+          $('#mx').value = String(Math.floor(x))
+          $('#my').value = String(Math.floor(y))
+          $('#modifyArea').style.display = 'flex'
+        })
+
+        $('#btnModifyCancel').addEventListener('click', () => {
+          $('#modifyArea').style.display = 'none'
+        })
+
+        $('#btnModifyApply').addEventListener('click', () => {
+          const x = clamp(parseInt($('#mx').value || '0', 10) || 0, 0, 1280)
+          const y = clamp(parseInt($('#my').value || '0', 10) || 0, 0, 720)
+          resumeFromHil('modify', { target: { x, y } })
+          const inst = currentInstance()
+          if (inst) {
+            inst.status = 'RUNNING'
+            syncButtons()
+            renderAll()
+          }
+        })
+
+        $('#btnExportJson').addEventListener('click', async () => {
+          const rep = store.report.last
+          if (!rep) {
+            pushLog('WARN', '暂无报告可导出')
+            return
+          }
+          const payload = {
+            schema_version: '1.0',
+            report_id: rep.reportId,
+            instance_id: rep.instanceId,
+            verdict: rep.verdict,
+            hil_count: rep.hilCount,
+            defects: rep.defects,
+            steps: rep.steps.map((s) => ({
+              no: s.no,
+              node: s.node,
+              action: s.action,
+              verify: s.verify
+            }))
+          }
+          const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json;charset=utf-8' })
+          const url = URL.createObjectURL(blob)
+          const a = document.createElement('a')
+          a.href = url
+          a.download = `report_${rep.instanceId}.json`
+          document.body.appendChild(a)
+          a.click()
+          a.remove()
+          URL.revokeObjectURL(url)
+          pushLog('INFO', '已导出 JSON 报告（mock）')
+        })
+
+        window.addEventListener('resize', () => {
+          const img = $('#liveShot')
+          const inst = currentInstance()
+          if (img && img.src && inst && inst.steps.length) {
+            const s = inst.steps.find((x) => x.no === inst.activeStepNo) || inst.steps[inst.steps.length - 1]
+            if (s) drawOverlay($('#overlay'), img, s.overlay)
+          }
+          const repImg = $('#repShot')
+          if (repImg && repImg.src && store.report.last) {
+            const rep = store.report.last
+            const s = rep.steps.find((x) => x.no === rep.activeStepNo) || rep.steps[rep.steps.length - 1]
+            if (s) drawOverlay($('#repOverlay'), repImg, s.overlay)
+          }
+          const hilImg = $('#hilShot')
+          if (hilImg && hilImg.src && store.hil.ticket) {
+            drawOverlay($('#hilOverlay'), hilImg, store.hil.ticket.overlay)
+          }
+        })
+      }
+
+      const bootstrap = () => {
+        ensureDefaultSelection()
+        syncPills()
+        bindUI()
+        const inst = currentInstance()
+        if (inst) {
+          const img = $('#liveShot')
+          img.src = mkSvgShot({ step: 0, title: '等待开始推流', accent: '#06B6D4' })
+          img.onload = () => drawOverlay($('#overlay'), img, null)
+        }
+        pushLog('INFO', 'Demo 初始化完成（mock 数据已加载）')
+        renderAll()
+      }
+
+      bootstrap()
+    </script>
+  </body>
+</html>
