@@ -1,0 +1,14 @@
+{
+  "schema_version": "1.0.0",
+  "created_at": "2025-03-25T10:00:00Z",
+  "updated_at": "2025-03-25T10:00:00Z",
+  "tenant_id": "tenant-001",
+  "instance_id": "inst-001",
+  "task_id": "task-001",
+  "status": "RUNNING",
+  "started_at": "2025-03-25T09:00:00Z",
+  "completed_at": null,
+  "step_count": 5,
+  "hil_count": 0,
+  "defect_count": 0
+}

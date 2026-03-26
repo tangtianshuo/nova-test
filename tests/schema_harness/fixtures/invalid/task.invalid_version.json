@@ -1,0 +1,14 @@
+{
+  "schema_version": "99.99.99",
+  "created_at": "2025-03-25T10:00:00Z",
+  "updated_at": "2025-03-25T10:00:00Z",
+  "tenant_id": "tenant-001",
+  "task_id": "task-invalid-version",
+  "name": "版本号无效的任务",
+  "url": "https://example.com",
+  "objective": "测试无效版本号",
+  "constraints": {
+    "max_steps": 10,
+    "forbidden_domains": []
+  }
+}

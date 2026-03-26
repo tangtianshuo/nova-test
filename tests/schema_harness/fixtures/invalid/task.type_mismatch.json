@@ -1,0 +1,14 @@
+{
+  "schema_version": "1.0.0",
+  "created_at": "2025-03-25T10:00:00Z",
+  "updated_at": "2025-03-25T10:00:00Z",
+  "tenant_id": "tenant-001",
+  "task_id": 12345,
+  "name": "类型不匹配的任务",
+  "url": "https://example.com",
+  "objective": "task_id 应该是字符串类型",
+  "constraints": {
+    "max_steps": "10",
+    "forbidden_domains": []
+  }
+}

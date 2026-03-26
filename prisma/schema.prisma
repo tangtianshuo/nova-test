@@ -1,0 +1,129 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Tenant {
+  id            String   @id @default(uuid())
+  name          String   @db.VarChar(100)
+  planType      String   @default("FREE") @map("plan_type")
+  balance       Float    @default(0.0)
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @updatedAt @map("updated_at")
+
+  users         User[]
+  tasks         TestTask[]
+
+  @@map("tenants")
+}
+
+model User {
+  id            String   @id @default(uuid())
+  tenantId      String   @map("tenant_id")
+  email         String   @unique @db.VarChar(255)
+  passwordHash  String   @map("password_hash") @db.VarChar(255)
+  role          String   @default("TESTER")
+  createdAt     DateTime @default(now()) @map("created_at")
+
+  tenant        Tenant   @relation(fields: [tenantId], references: [id])
+
+  @@index([tenantId])
+  @@map("users")
+}
+
+model TestTask {
+  id               String   @id @default(uuid())
+  tenantId         String   @map("tenant_id")
+  name             String   @db.VarChar(255)
+  targetUrl        String   @map("target_url") @db.Text
+  naturalObjective String   @map("natural_objective") @db.Text
+  constraints      Json?
+  status           String   @default("ACTIVE")
+  createdAt        DateTime @default(now()) @map("created_at")
+  updatedAt        DateTime @updatedAt @map("updated_at")
+
+  tenant           Tenant          @relation(fields: [tenantId], references: [id])
+  instances        AgentInstance[]
+
+  @@index([tenantId])
+  @@index([status])
+  @@map("test_tasks")
+}
+
+model AgentInstance {
+  id               String    @id @default(uuid())
+  tenantId         String    @map("tenant_id")
+  taskId           String    @map("task_id")
+  status           String    @default("PENDING")
+  langgraphState   Json?     @map("langgraph_state")
+  startedAt        DateTime? @map("started_at")
+  completedAt      DateTime? @map("completed_at")
+  stepCount        Int       @default(0) @map("step_count")
+  hilCount         Int       @default(0) @map("hil_count")
+  defectCount      Int       @default(0) @map("defect_count")
+  errorMessage     String?   @map("error_message") @db.Text
+  createdAt        DateTime  @default(now()) @map("created_at")
+  updatedAt        DateTime  @updatedAt @map("updated_at")
+
+  task             TestTask     @relation(fields: [taskId], references: [id])
+  steps            TestStep[]
+
+  @@index([tenantId])
+  @@index([taskId])
+  @@index([status])
+  @@map("agent_instances")
+}
+
+model TestStep {
+  id               String    @id @default(uuid())
+  instanceId       String    @map("instance_id")
+  stepNumber       Int       @map("step_number")
+  nodeName         String    @map("node_name") @db.VarChar(50)
+  screenshotUrl    String?   @map("screenshot_url") @db.Text
+  thought          String?   @db.Text
+  actionType       String?   @map("action_type") @db.VarChar(50)
+  actionTarget     Json?     @map("action_target")
+  actionParams     Json?     @map("action_params")
+  confidence       Float?
+  expectedResult   String?   @map("expected_result") @db.Text
+  isSuccess        Boolean?  @map("is_success")
+  isDefect         Boolean?  @map("is_defect")
+  verificationMsg  String?   @map("verification_msg") @db.Text
+  executedAt       DateTime  @default(now()) @map("executed_at")
+  durationMs       Int       @default(0) @map("duration_ms")
+
+  instance         AgentInstance @relation(fields: [instanceId], references: [id])
+
+  @@index([instanceId])
+  @@index([stepNumber])
+  @@map("test_steps")
+}
+
+model HilTicket {
+  id               String    @id @default(uuid())
+  tenantId         String    @map("tenant_id")
+  instanceId       String    @unique @map("instance_id")
+  stepNo           Int       @map("step_no")
+  reason           String    @db.Text
+  riskLevel        String    @default("MEDIUM") @map("risk_level")
+  status           String    @default("WAITING")
+  plannedAction    Json?     @map("planned_action")
+  screenshotUrl    String?   @map("screenshot_url") @db.Text
+  overlay          Json?
+  decision         String?
+  modifiedAction   Json?     @map("modified_action")
+  decidedBy        String?   @map("decided_by")
+  decidedAt        DateTime? @map("decided_at")
+  expiresAt        DateTime? @map("expires_at")
+  createdAt        DateTime  @default(now()) @map("created_at")
+  updatedAt        DateTime  @updatedAt @map("updated_at")
+
+  @@index([tenantId])
+  @@index([instanceId])
+  @@index([status])
+  @@map("hil_tickets")
+}

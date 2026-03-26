@@ -1,0 +1,15 @@
+{
+  "schema_version": "1.0.0",
+  "created_at": "2025-03-25T10:00:00Z",
+  "updated_at": "2025-03-25T10:00:00Z",
+  "tenant_id": "tenant-001",
+  "task_id": "task-001",
+  "name": "电商核心购买流程测试",
+  "url": "https://shop.example.com",
+  "objective": "搜索MacBook，加入购物车并结算，不进行最终付款",
+  "constraints": {
+    "max_steps": 18,
+    "forbidden_domains": ["stripe.com", "alipay.com"]
+  },
+  "tags": ["e2e", "smoke", "regression"]
+}

@@ -1,0 +1,52 @@
+{
+  "schema_version": "1.0.0",
+  "created_at": "2025-03-25T10:00:00Z",
+  "updated_at": "2025-03-25T10:00:00Z",
+  "tenant_id": "tenant-001",
+  "step_id": "step-001",
+  "instance_id": "inst-001",
+  "step_no": 1,
+  "node": "init",
+  "screenshot_url": "https://storage.example.com/screenshots/step-001.png",
+  "overlay": {
+    "base_w": 1280,
+    "base_h": 720,
+    "boxes": [
+      {
+        "x": 600,
+        "y": 450,
+        "w": 80,
+        "h": 60
+      }
+    ],
+    "point": {
+      "x": 640,
+      "y": 480
+    }
+  },
+  "action": {
+    "thought": "开始初始化测试，识别到登录按钮并点击进入系统",
+    "action_type": "click",
+    "target": {
+      "selector": "#login-btn",
+      "x": 640,
+      "y": 480,
+      "bbox": {
+        "x": 600,
+        "y": 450,
+        "w": 80,
+        "h": 60
+      }
+    },
+    "params": {},
+    "confidence": 0.95,
+    "expected_result": "成功登录并进入主页"
+  },
+  "verify": {
+    "is_success": true,
+    "is_defect": false,
+    "message": "登录按钮点击成功，页面跳转到首页"
+  },
+  "executed_at": "2025-03-25T09:00:01.000Z",
+  "duration_ms": 1500
+}

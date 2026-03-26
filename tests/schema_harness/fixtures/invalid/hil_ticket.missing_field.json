@@ -1,0 +1,12 @@
+{
+  "schema_version": "1.0.0",
+  "created_at": "2025-03-25T10:00:00Z",
+  "updated_at": "2025-03-25T10:00:00Z",
+  "tenant_id": "",
+  "ticket_id": "",
+  "instance_id": "",
+  "step_no": -1,
+  "status": "INVALID_STATUS",
+  "reason": "",
+  "risk_level": "INVALID_RISK"
+}

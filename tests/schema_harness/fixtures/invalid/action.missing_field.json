@@ -1,0 +1,17 @@
+{
+  "schema_version": "1.0.0",
+  "created_at": "2025-03-25T10:00:00Z",
+  "updated_at": "2025-03-25T10:00:00Z",
+  "tenant_id": "",
+  "action_id": "",
+  "instance_id": "",
+  "step_no": -1,
+  "thought": "",
+  "action_type": "invalid_action",
+  "target": {},
+  "params": {},
+  "confidence": 1.5,
+  "expected_result": "",
+  "generated_at": "",
+  "model_version": ""
+}

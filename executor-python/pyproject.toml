@@ -1,0 +1,40 @@
+# AaaS 执行引擎 - Python FastAPI + LangGraph
+# 严格遵循 docs/design/02_概要设计文档_v1.0.md 的技术栈要求
+
+[project]
+name = "nova-executor"
+version = "1.0.0"
+description = "AaaS Execution Engine - FastAPI + LangGraph"
+requires-python = ">=3.11"
+dependencies = [
+    "fastapi>=0.115.0",
+    "uvicorn[standard]>=0.30.0",
+    "langgraph>=0.2.0",
+    "langgraph-checkpoint>=2.0.0",
+    "langchain-core>=0.3.0",
+    "langchain-openai>=0.2.0",
+    "playwright>=1.48.0",
+    "httpx>=0.27.0",
+    "redis>=5.0.0",
+    "pydantic>=2.9.0",
+    "python-dotenv>=1.0.0",
+    "tenacity>=8.5.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.3.0",
+    "pytest-asyncio>=0.24.0",
+    "pytest-cov>=6.0.0",
+    "httpx>=0.27.0",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_functions = ["test_*"]

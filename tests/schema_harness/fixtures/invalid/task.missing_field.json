@@ -1,0 +1,10 @@
+{
+  "schema_version": "1.0.0",
+  "created_at": "2025-03-25T10:00:00Z",
+  "updated_at": "2025-03-25T10:00:00Z",
+  "tenant_id": "tenant-001",
+  "task_id": "task-invalid",
+  "name": "缺少必填字段的无效任务",
+  "url": "not-a-valid-url",
+  "objective": ""
+}

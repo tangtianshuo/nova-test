@@ -1,0 +1,61 @@
+{
+  "schema_version": "1.0.0",
+  "created_at": "2025-03-25T10:00:00Z",
+  "updated_at": "2025-03-25T10:00:00Z",
+  "tenant_id": "tenant-001",
+  "report_id": "report-001",
+  "instance_id": "inst-001",
+  "task_id": "task-001",
+  "verdict": "SUCCESS",
+  "status": "SUCCESS",
+  "summary": "电商核心购买流程测试通过，无缺陷发现",
+  "statistics": {
+    "total_steps": 10,
+    "passed_steps": 10,
+    "failed_steps": 0,
+    "hil_count": 0,
+    "defect_count": 0,
+    "total_duration_ms": 45000,
+    "average_step_duration_ms": 4500
+  },
+  "defects": [],
+  "steps": [
+    {
+      "step_no": 1,
+      "node": "init",
+      "action": {
+        "thought": "开始测试",
+        "action_type": "click",
+        "target": {
+          "selector": "#start-btn",
+          "x": 640,
+          "y": 400
+        },
+        "params": {},
+        "confidence": 0.98,
+        "expected_result": "进入搜索页面"
+      },
+      "verify": {
+        "is_success": true,
+        "is_defect": false,
+        "message": "成功进入搜索页面"
+      },
+      "screenshot_url": "https://storage.example.com/screenshots/step-1.png",
+      "overlay": {
+        "base_w": 1280,
+        "base_h": 720,
+        "boxes": [],
+        "point": {
+          "x": 640,
+          "y": 400
+        }
+      },
+      "executed_at": "2025-03-25T09:00:00.000Z",
+      "duration_ms": 3000
+    }
+  ],
+  "started_at": "2025-03-25T09:00:00.000Z",
+  "completed_at": "2025-03-25T10:00:45.000Z",
+  "generated_at": "2025-03-25T10:00:45.000Z",
+  "export_formats": ["JSON", "PDF", "EXCEL"]
+}
