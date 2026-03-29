@@ -25,9 +25,11 @@ from nova_executor.hil.ticket_service import (
 )
 from nova_executor.types import ExecutionState, PlannedAction, ActionType
 from nova_executor.config import get_settings
+from nova_executor.audit import get_audit_logger, AuditEventType, AuditOutcome
 
 logger = logging.getLogger(__name__)
 settings = get_settings()
+audit_logger = get_audit_logger()
 
 
 @dataclass
@@ -89,7 +91,6 @@ class HilProcessor:
             f"decision={decision.value}, user={user_id}"
         )
 
-        # 解决工单
         resolved_ticket = await self.ticket_service.resolve_ticket(
             ticket_id=ticket.id,
             user_id=user_id,
@@ -100,6 +101,16 @@ class HilProcessor:
 
         if not resolved_ticket:
             logger.error(f"[HilProcessor] 工单解决失败: {ticket.id}")
+            audit_logger.log_hil_event(
+                event_type=AuditEventType.HIL_TICKET_APPROVED,
+                ticket_id=ticket.id,
+                instance_id=ticket.instance_id,
+                user_id=user_id,
+                tenant_id=ticket.tenant_id,
+                decision=decision.value,
+                outcome=AuditOutcome.FAILURE,
+                error_message="工单解决失败",
+            )
             return ProcessedDecision(
                 should_execute=False,
                 action_to_execute=None,
@@ -107,7 +118,6 @@ class HilProcessor:
                 terminate_instance=True,
             )
 
-        # 根据决策类型处理
         if decision == HilTicketDecision.APPROVED:
             return self._process_approve(resolved_ticket)
 

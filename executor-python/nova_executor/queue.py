@@ -18,9 +18,11 @@ import redis.asyncio as redis
 from nova_executor.config import get_settings
 from nova_executor.types import ExecutionState, NodeName
 from nova_executor.graph import ExecutionGraph
+from nova_executor.audit import get_audit_logger, AuditEventType, AuditOutcome
 
 logger = logging.getLogger(__name__)
 settings = get_settings()
+audit_logger = get_audit_logger()
 
 
 class QueueConsumer:
@@ -97,11 +99,21 @@ class QueueConsumer:
             message: 任务消息 JSON
         """
         try:
-            # 解析消息
             data = json.loads(message)
             logger.info(f"[Queue] 收到任务: {data.get('instance_id')}")
 
-            # 创建初始状态
+            audit_logger.log_task_event(
+                event_type=AuditEventType.TASK_CREATED,
+                instance_id=data["instance_id"],
+                task_id=data["task_id"],
+                tenant_id=data["tenant_id"],
+                outcome=AuditOutcome.SUCCESS,
+                metadata={
+                    "target_url": data.get("target_url"),
+                    "max_steps": data.get("max_steps", 10),
+                },
+            )
+
             state = ExecutionState(
                 instance_id=data["instance_id"],
                 tenant_id=data["tenant_id"],
@@ -112,7 +124,6 @@ class QueueConsumer:
                 max_steps=data.get("max_steps", 10),
             )
 
-            # 执行状态机
             config = {
                 "configurable": {
                     "thread_id": state.instance_id,
@@ -122,10 +133,26 @@ class QueueConsumer:
 
             await self.graph.execute(state, config)
 
+            audit_logger.log_task_event(
+                event_type=AuditEventType.TASK_COMPLETED,
+                instance_id=data["instance_id"],
+                task_id=data["task_id"],
+                tenant_id=data["tenant_id"],
+                outcome=AuditOutcome.SUCCESS,
+            )
+
             logger.info(f"[Queue] 任务执行完成: {data['instance_id']}")
 
         except Exception as e:
             logger.exception(f"[Queue] 处理任务失败: {e}")
+            audit_logger.log_task_event(
+                event_type=AuditEventType.TASK_FAILED,
+                instance_id=data.get("instance_id", "unknown"),
+                task_id=data.get("task_id", "unknown"),
+                tenant_id=data.get("tenant_id", "unknown"),
+                outcome=AuditOutcome.FAILURE,
+                error_message=str(e),
+            )
 
     async def publish_stream(
         self,

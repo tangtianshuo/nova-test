@@ -26,6 +26,11 @@ from nova_executor.hil.ticket_service import (
     HilTicketDecision,
     HilTicket,
 )
+from nova_executor.hil.checkpoint_service import (
+    WorkerCheckpointService,
+    WorkerCheckpoint,
+    CheckpointStatus,
+)
 
 
 @pytest.fixture
@@ -101,6 +106,40 @@ def sample_hil_ticket() -> HilTicket:
 def hil_ticket_service():
     """创建 HIL 工单服务实例"""
     return HilTicketService()
+
+
+@pytest.fixture
+def worker_checkpoint_service() -> WorkerCheckpointService:
+    """创建 Worker 检查点服务实例"""
+    return WorkerCheckpointService()
+
+
+@pytest.fixture
+def sample_worker_checkpoint() -> WorkerCheckpoint:
+    """创建示例 Worker 检查点"""
+    return WorkerCheckpoint(
+        id="checkpoint-001",
+        instance_id="test-instance-001",
+        current_node="check_hil",
+        step_count=3,
+        execution_state={
+            "instance_id": "test-instance-001",
+            "tenant_id": "test-tenant-001",
+            "task_id": "test-task-001",
+            "current_node": "check_hil",
+            "step_count": 3,
+        },
+        planned_action={
+            "action_type": "click",
+            "selector": "#submit",
+            "confidence": 0.5,
+        },
+        worker_id="worker-001",
+        ticket_id="ticket-001",
+        hil_triggered=True,
+        interrupted_reason="HIL_TIMEOUT",
+        status=CheckpointStatus.INTERRUPTED,
+    )
 
 
 @pytest.fixture

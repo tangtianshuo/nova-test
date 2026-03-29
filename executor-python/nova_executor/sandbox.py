@@ -14,8 +14,10 @@ import base64
 from typing import Dict, Optional
 
 from playwright.async_api import async_playwright, Browser, BrowserContext, Page, Playwright
+from nova_executor.audit import get_audit_logger, AuditEventType, AuditOutcome
 
 logger = logging.getLogger(__name__)
+audit_logger = get_audit_logger()
 
 
 class SandboxInstance:
@@ -104,27 +106,35 @@ class SandboxManager:
         """
         logger.info(f"[Sandbox] 创建沙箱: {instance_id}")
 
-        # 确保浏览器已启动
         await self._ensure_browser()
 
-        # 创建上下文
         context = await self.browser.new_context(
             viewport={"width": viewport_width, "height": viewport_height},
             user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
         )
 
-        # 创建页面
         page = await context.new_page()
 
-        # 导航到目标 URL
         try:
             await page.goto(target_url, wait_until="domcontentloaded", timeout=30000)
         except Exception as e:
             logger.warning(f"[Sandbox] 导航失败: {target_url}, {e}")
 
-        # 创建沙箱实例
         sandbox = SandboxInstance(instance_id, context, page)
         self.sandboxes[instance_id] = sandbox
+
+        audit_logger.log(
+            event_type=AuditEventType.SANDBOX_CREATED,
+            outcome=AuditOutcome.SUCCESS,
+            context=None,
+            resource_type="SANDBOX",
+            resource_id=instance_id,
+            metadata={
+                "target_url": target_url,
+                "headless": headless,
+                "viewport": f"{viewport_width}x{viewport_height}",
+            },
+        )
 
         return sandbox
 
@@ -152,9 +162,28 @@ class SandboxManager:
         try:
             await sandbox.close()
             del self.sandboxes[instance_id]
+
+            audit_logger.log(
+                event_type=AuditEventType.SANDBOX_DESTROYED,
+                outcome=AuditOutcome.SUCCESS,
+                context=None,
+                resource_type="SANDBOX",
+                resource_id=instance_id,
+            )
+
             return True
         except Exception as e:
             logger.error(f"[Sandbox] 销毁沙箱失败: {e}")
+
+            audit_logger.log(
+                event_type=AuditEventType.SANDBOX_DESTROYED,
+                outcome=AuditOutcome.FAILURE,
+                context=None,
+                resource_type="SANDBOX",
+                resource_id=instance_id,
+                error_message=str(e),
+            )
+
             return False
 
     async def destroy_all(self):

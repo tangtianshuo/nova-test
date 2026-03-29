@@ -2,7 +2,7 @@
 结构化日志记录器
 ================
 
-提供统一格式的日志接口，支持上下文追踪
+提供统一格式的日志接口，支持上下文追踪和安全脱敏
 
 严格遵循 docs/design/02_概要设计文档_v1.0.md 的技术栈要求
 """
@@ -15,6 +15,12 @@ from typing import Optional, Dict, Any
 from contextvars import ContextVar
 from dataclasses import dataclass, field
 from enum import Enum
+
+from nova_executor.security.sanitizer import (
+    SensitiveSanitizer,
+    SanitizationLevel,
+    scan_for_secrets,
+)
 
 # 上下文变量
 trace_id_var: ContextVar[Optional[str]] = ContextVar("trace_id", default=None)
@@ -103,17 +109,45 @@ class Logger:
     1. JSON 格式输出
     2. 上下文追踪 (trace_id, tenant_id, instance_id)
     3. 多级别日志
+    4. 敏感信息脱敏
     """
 
-    def __init__(self, name: str):
+    def __init__(self, name: str, enable_sanitization: bool = True):
         self.logger = logging.getLogger(name)
-        self.logger.setLevel(logging.INFO)
+        self.logger.setLevel(logging.DEBUG)
+        self.enable_sanitization = enable_sanitization
 
-        # 添加 JSON 格式化处理器
+        if self.enable_sanitization:
+            self._sanitizer = SensitiveSanitizer(SanitizationLevel.PARTIAL)
+        else:
+            self._sanitizer = None
+
         if not self.logger.handlers:
             handler = logging.StreamHandler(sys.stdout)
             handler.setFormatter(JSONFormatter())
             self.logger.addHandler(handler)
+
+    def _sanitize_message(self, message: str, level: str = "INFO") -> tuple[str, bool]:
+        """
+        脱敏消息并返回是否检测到敏感信息
+
+        Args:
+            message: 原始消息
+            level: 日志级别
+
+        Returns:
+            (脱敏后的消息, 是否检测到敏感信息)
+        """
+        if not self.enable_sanitization or not self._sanitizer:
+            return message, False
+
+        scan_result = scan_for_secrets(message)
+
+        if scan_result.is_clean:
+            return message, False
+
+        sanitized_message = self._sanitizer.sanitize_log(message, level)
+        return sanitized_message, True
 
     def _log(
         self,
@@ -123,10 +157,20 @@ class Logger:
         exc_info: Optional[Exception] = None,
     ):
         """内部日志方法"""
+        sanitized_message, has_sensitive = self._sanitize_message(message, level)
+
+        if has_sensitive:
+            warning_msg = f"[SECURITY] Sensitive information detected and sanitized in log: {message[:100]}..."
+            self.logger.log(
+                logging.WARNING,
+                warning_msg,
+                extra={"extra_fields": extra} if extra else {},
+            )
+
         extra_fields = {"extra_fields": extra} if extra else {}
         self.logger.log(
             getattr(logging, level.upper()),
-            message,
+            sanitized_message,
             extra=extra_fields,
             exc_info=exc_info,
         )

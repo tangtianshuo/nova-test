@@ -23,11 +23,16 @@ from nova_executor.types import ExecutionState, InstanceStatus, NodeName
 from nova_executor.graph import ExecutionGraph
 from nova_executor.queue import QueueConsumer
 from nova_executor.sandbox import SandboxManager
-from nova_executor.streaming import ws_server, stream_publisher
+from nova_executor.streaming import ws_router
+from nova_executor.streaming.publisher import StreamPublisher
 from nova_executor.streaming.events import EventType
-from nova_executor.hil import hil_ticket_service, hil_processor, HilTicketDecision
+from nova_executor.hil import HilTicketService, HilProcessor, hil_ticket_service
+from nova_executor.hil.ticket_service import HilTicketDecision, HilTicket
 from nova_executor.health import health_checker
 from nova_executor.metrics import metrics
+from nova_executor.audit import get_audit_logger, AuditEventType, AuditOutcome
+
+audit_logger = get_audit_logger()
 
 # 配置日志
 logging.basicConfig(
@@ -142,7 +147,11 @@ async def readiness():
 @app.get("/metrics")
 async def get_metrics():
     """Prometheus 指标端点"""
-    return metrics.get_metrics()
+    from fastapi.responses import Response
+    return Response(
+        content=metrics.get_metrics(),
+        media_type=metrics.get_content_type(),
+    )
 
 
 # ============ 任务管理 ============
@@ -156,7 +165,18 @@ async def start_task(request: StartTaskRequest, background_tasks: BackgroundTask
     """
     logger.info(f"[API] 启动任务: {request.instance_id}")
 
-    # 创建初始状态
+    audit_logger.log_task_event(
+        event_type=AuditEventType.TASK_STARTED,
+        instance_id=request.instance_id,
+        task_id=request.task_id,
+        tenant_id=request.tenant_id,
+        outcome=AuditOutcome.SUCCESS,
+        metadata={
+            "target_url": request.target_url,
+            "max_steps": request.max_steps,
+        },
+    )
+
     initial_state = ExecutionState(
         instance_id=request.instance_id,
         tenant_id=request.tenant_id,
@@ -167,7 +187,6 @@ async def start_task(request: StartTaskRequest, background_tasks: BackgroundTask
         max_steps=request.max_steps,
     )
 
-    # 在后台执行
     background_tasks.add_task(graph.execute, initial_state)
 
     return TaskStatusResponse(
@@ -220,7 +239,14 @@ async def resume_task(instance_id: str, background_tasks: BackgroundTasks):
     if not state.hil_triggered:
         raise HTTPException(status_code=400, detail="Task is not in HIL state")
 
-    # 清除 HIL 状态，继续执行
+    audit_logger.log_task_event(
+        event_type=AuditEventType.TASK_RESUMED,
+        instance_id=instance_id,
+        task_id=state.task_id,
+        tenant_id=state.tenant_id,
+        outcome=AuditOutcome.SUCCESS,
+    )
+
     graph.update_state(config, {"hil_triggered": False})
     state = graph.get_state(config)
 
@@ -238,14 +264,23 @@ async def terminate_task(instance_id: str):
     """
     logger.info(f"[API] 终止任务: {instance_id}")
 
-    # 更新状态
     config = {"configurable": {"thread_id": instance_id}}
+    state = graph.get_state(config)
+
+    audit_logger.log_task_event(
+        event_type=AuditEventType.TASK_TERMINATED,
+        instance_id=instance_id,
+        task_id=state.task_id if state else "",
+        tenant_id=state.tenant_id if state else "",
+        outcome=AuditOutcome.SUCCESS,
+        metadata={"terminated_by": "api-user"},
+    )
+
     graph.update_state(config, {
         "error": "Terminated by user",
         "hil_triggered": True,
     })
 
-    # 清理沙箱
     await sandbox_manager.destroy(instance_id)
 
     return {"message": "Task terminated", "instance_id": instance_id}
@@ -262,24 +297,40 @@ async def hil_decision(request: HilDecisionRequest, background_tasks: Background
     """
     logger.info(f"[API] HIL 决策: {request.ticket_id}, {request.decision}")
 
-    # 获取工单
     ticket = await hil_ticket_service.get_ticket(request.ticket_id)
     if not ticket:
         raise HTTPException(status_code=404, detail="Ticket not found")
 
-    # 处理决策
     decision_enum = HilTicketDecision(request.decision)
     result = await hil_processor.process_decision(
         ticket=ticket,
         decision=decision_enum,
-        user_id="api-user",  # TODO: 从认证获取
+        user_id="api-user",
         human_feedback=request.feedback,
         modified_action=request.modified_action,
     )
 
-    # 根据决策结果处理
+    hil_event_type = {
+        "APPROVED": AuditEventType.HIL_TICKET_APPROVED,
+        "REJECTED": AuditEventType.HIL_TICKET_REJECTED,
+        "MODIFIED": AuditEventType.HIL_TICKET_MODIFIED,
+    }.get(request.decision, AuditEventType.HIL_TICKET_APPROVED)
+
+    audit_logger.log_hil_event(
+        event_type=hil_event_type,
+        ticket_id=request.ticket_id,
+        instance_id=ticket.instance_id,
+        user_id="api-user",
+        tenant_id=ticket.tenant_id,
+        decision=request.decision,
+        outcome=AuditOutcome.SUCCESS,
+        metadata={
+            "feedback": request.feedback,
+            "modified_action": request.modified_action,
+        },
+    )
+
     if result.terminate_instance:
-        # 终止实例
         config = {"configurable": {"thread_id": ticket.instance_id}}
         graph.update_state(config, {
             "error": f"HIL rejected: {request.feedback}",
@@ -295,10 +346,8 @@ async def hil_decision(request: HilDecisionRequest, background_tasks: Background
         }
 
     else:
-        # 恢复执行
         config = {"configurable": {"thread_id": ticket.instance_id}}
 
-        # 更新状态
         updates = {
             "hil_triggered": False,
             "planned_action": (
@@ -309,7 +358,6 @@ async def hil_decision(request: HilDecisionRequest, background_tasks: Background
         }
         graph.update_state(config, updates)
 
-        # 发布恢复事件
         await stream_publisher.publish_thought(
             instance_id=ticket.instance_id,
             thought=f"HIL resolved: {decision_enum.value}",

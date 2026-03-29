@@ -16,8 +16,10 @@ from dataclasses import dataclass
 
 from nova_executor.types import PlannedAction, ActionType
 from nova_executor.sandbox import SandboxManager
+from nova_executor.audit import get_audit_logger, AuditEventType, AuditOutcome
 
 logger = logging.getLogger(__name__)
+audit_logger = get_audit_logger()
 
 
 @dataclass
@@ -57,6 +59,7 @@ class ExecutorAdapter(ExecutorAdapterBase):
         instance_id: str,
         action: PlannedAction,
         previous_screenshot: Optional[str],
+        tenant_id: Optional[str] = None,
     ) -> ExecutionResult:
         """
         执行动作
@@ -65,6 +68,7 @@ class ExecutorAdapter(ExecutorAdapterBase):
             instance_id: 实例 ID
             action: 计划动作
             previous_screenshot: 前一个截图
+            tenant_id: 租户 ID
 
         Returns:
             执行结果
@@ -74,6 +78,13 @@ class ExecutorAdapter(ExecutorAdapterBase):
         try:
             sandbox = self.sandbox_manager.get_sandbox(instance_id)
             if not sandbox:
+                audit_logger.log_action_event(
+                    action_type=action.action_type.value,
+                    instance_id=instance_id,
+                    tenant_id=tenant_id or "",
+                    success=False,
+                    error_message=f"Sandbox not found for instance: {instance_id}",
+                )
                 return ExecutionResult(
                     success=False,
                     error=f"Sandbox not found for instance: {instance_id}"
@@ -81,7 +92,6 @@ class ExecutorAdapter(ExecutorAdapterBase):
 
             action_type = action.action_type.value
 
-            # 根据动作类型执行
             if action_type == ActionType.CLICK.value:
                 if not action.selector:
                     return ExecutionResult(success=False, error="Missing selector")
@@ -104,13 +114,25 @@ class ExecutorAdapter(ExecutorAdapterBase):
                 await sandbox.wait_for_timeout(1000)
 
             elif action_type == ActionType.SCREENSHOT.value:
-                pass  # 截图是最后统一做的
+                pass
 
             else:
                 return ExecutionResult(success=False, error=f"Unknown action type: {action_type}")
 
-            # 执行成功后截图
             screenshot = await sandbox.screenshot()
+
+            audit_logger.log_action_event(
+                action_type=action.action_type.value,
+                instance_id=instance_id,
+                tenant_id=tenant_id or "",
+                success=True,
+                metadata={
+                    "selector": action.selector,
+                    "value": action.value,
+                    "confidence": action.confidence,
+                },
+            )
+
             return ExecutionResult(success=True, screenshot=screenshot)
 
         except Exception as e:
@@ -119,6 +141,15 @@ class ExecutorAdapter(ExecutorAdapterBase):
                 screenshot = await sandbox.screenshot() if sandbox else None
             except:
                 screenshot = None
+
+            audit_logger.log_action_event(
+                action_type=action.action_type.value,
+                instance_id=instance_id,
+                tenant_id=tenant_id or "",
+                success=False,
+                error_message=str(e),
+            )
+
             return ExecutionResult(success=False, error=str(e), screenshot=screenshot)
 
 

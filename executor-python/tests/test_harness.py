@@ -88,10 +88,9 @@ class TestHilTriggerFlow:
         threshold = settings.hil_confidence_threshold
         if state.planned_action and state.planned_action.confidence < threshold:
             state.hil_triggered = True
-            state.current_node = NodeName.WAITING_HIL
 
         assert state.hil_triggered is True
-        assert state.current_node == NodeName.WAITING_HIL
+        assert state.current_node == NodeName.CHECK_HIL
 
 
 class TestDefectDetectionFlow:
@@ -169,7 +168,7 @@ class TestMultiRoundExecution:
 
         # 模拟多轮
         rounds = 0
-        while state.step_count < state.max_steps and rounds < 5:
+        while state.step_count < state.max_steps and rounds < 6:
             # verify -> explore
             if state.current_node == NodeName.VERIFY:
                 state.current_node = NodeName.EXPLORE

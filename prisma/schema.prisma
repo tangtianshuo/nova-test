@@ -127,3 +127,31 @@ model HilTicket {
   @@index([status])
   @@map("hil_tickets")
 }
+
+model WorkerCheckpoint {
+  id                     String    @id @default(uuid())
+  instanceId             String    @map("instance_id")
+  ticketId               String?   @map("ticket_id")
+  currentNode            String    @map("current_node")
+  stepCount              Int       @default(0) @map("step_count")
+  executionState         Json      @map("execution_state")
+  plannedAction          Json?     @map("planned_action")
+  screenshotData         String?   @map("screenshot_data")
+  workerId               String?   @map("worker_id")
+  interruptedAt          DateTime  @default(now()) @map("interrupted_at")
+  interruptedReason      String?   @map("interrupted_reason")
+  hilTriggered           Boolean   @default(false) @map("hil_triggered")
+  lastError              String?   @map("last_error") @db.Text
+  retryCount             Int       @default(0) @map("retry_count")
+  status                 String    @default("INTERRUPTED") @map("status")
+  version                Int       @default(1) @map("version")
+  metadata               Json?     @map("metadata")
+  createdAt              DateTime  @default(now()) @map("created_at")
+  updatedAt              DateTime  @updatedAt @map("updated_at")
+
+  @@index([instanceId])
+  @@index([ticketId])
+  @@index([status])
+  @@index([workerId])
+  @@map("worker_checkpoints")
+}
